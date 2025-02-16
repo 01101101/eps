@@ -1,0 +1,20 @@
+@font-face {
+    font-family: "DS-DIGI";
+    src: url('DS-DIGII.ttf');
+}
+
+body {
+    margin: 0;
+    background-color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+#loading {
+    font-family: "DS-DIGI";
+    font-size: 24px;
+    color: rgb(118, 232, 247);
+}
+
