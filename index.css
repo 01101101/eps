@@ -1,20 +1,136 @@
 @font-face {
-    font-family: "DS-DIGI";
-    src: url('DS-DIGII.ttf');
+    font-family: "LCD";
+    src: url("./LCD.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: 'Space Grotesk';
+    font-style: normal;
+    font-weight: 300 700;
+    font-display: swap;
+    src: url("./SpaceGrotesk.woff2") format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 body {
+    font-family: 'Space Grotesk';
     margin: 0;
     background-color: #000;
     display: flex;
     align-items: center;
     justify-content: center;
     height: 100vh;
+    user-select: none;
 }
 
-#loading {
-    font-family: "DS-DIGI";
+#eps {
+    border: 1px solid #222;
+    border-radius: 2px;
+    width: 800px;
+    height: 600px;
+    display: grid;
+    grid-template-rows: min-content 1fr;
+}
+
+#lcd {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    border-bottom: 1px solid #222;
+    position: relative;
+}
+
+#lcd .midi {
+    position: absolute;
+    color: #222;
+    height: 100%;
+    top: 0;
+    display: flex;
+    align-items: center;
+}
+
+#lcd .midi select {
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: #222;
+    font-family: 'Space Grotesk';
+    font-size: 16px;
+    outline: none;
+}
+
+#lcd .midi > div {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid transparent;
+    padding: 4px 8px;
+    border-radius: 2px;
+}
+
+#lcd .midi > div:hover {
+    border-color: #222;
+}
+
+#lcd .midi svg {
+    width: 24px;
+    height: 24px;
+}
+
+#lcd .midi.in {
+    left: 0;
+    transform: translateX(calc(-100% - 16px));
+}
+
+#lcd .midi.in select {
+    text-align: right;
+}
+
+#lcd .midi.out {
+    right: 0;
+    transform: translateX(calc(100% + 16px));
+}
+
+#lcd .tags {
+    display: flex;
+    gap: 8px;
+}
+
+#lcd .tag {
+    background-color: #222;
+    padding: 0 2px;
+    font-size: 12px;
+    transform: skewX(-8deg);
+    border-radius: 1px;
+}
+
+#lcd .tag.active {
+    background-color: rgb(41, 240, 247);
+    box-shadow: 0 0 3px rgba(41, 240, 247, 1);
+}
+
+#lcd .text {
+    font-family: "LCD";
     font-size: 24px;
-    color: rgb(118, 232, 247);
+    color: rgb(41, 240, 247);
+    text-shadow: 0 0 6px rgba(41, 240, 247, 1);
 }
 
+#logs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    color: #fff;
+    font-size: 12px;
+    overflow: hidden;
+}
+
+#logs > div {
+    padding: 16px;
+    overflow: auto;
+    scrollbar-width: none;
+}
+
+#logs .in {
+    border-right: 1px solid #222;
+}
