@@ -1,0 +1,12 @@
+@import 'tailwindcss';
+
+@font-face {
+    font-family: "LCD";
+    src: url("./assets/LCD.woff2") format("woff2");
+}
+
+@theme {
+    --color-primary: #00ffff;
+    --font-lcd: 'LCD';
+    --font-sans: 'JetBrains Mono Variable';
+}
