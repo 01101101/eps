@@ -121,7 +121,7 @@ export const BoundingBox = ({ id, size, position, children, className }) => {
   return (
     <div
       className={cx(
-        'absolute top-0 left-0 rounded-sm border p-[2px]',
+        'absolute top-0 left-0 flex flex-col gap-0.5 rounded-sm border p-[2px]',
         isActive && !isDragging ? 'border-primary' : 'border-transparent',
         activePosition != null && 'pointer-events-none',
         className
@@ -135,7 +135,7 @@ export const BoundingBox = ({ id, size, position, children, className }) => {
       {children}
       {isDragging && currentPosition.type === 'relative' && (
         <div className="flex w-full justify-center text-[10px]">
-          {currentPosition.x} x {currentPosition.y}
+          ({currentPosition.x},{currentPosition.y})
         </div>
       )}
       {isActive && (

@@ -71,7 +71,7 @@ export const ToolBox = () => {
 
   return (
     <div
-      className="absolute -top-px -left-2 flex h-[calc(100%+2px)] w-44 -translate-x-full flex-col gap-[5px] overflow-y-auto rounded-sm border border-neutral-700 bg-black p-[10px]"
+      className="absolute -top-px -left-2 flex h-[calc(100%+2px)] w-44 -translate-x-full flex-col gap-1 overflow-y-auto rounded-sm border border-neutral-700 bg-black p-[10px]"
       style={{ scrollbarWidth: 'none' }}>
       {Object.keys(allWidgets)
         .filter((type) => !type.endsWith('Size'))
@@ -86,7 +86,7 @@ export const ToolBox = () => {
             {widget({})}
             {position.type === 'relative' && (
               <div className="flex w-full justify-center text-[10px]">
-                {position.x} x {position.y}
+                ({position.x},{position.y})
               </div>
             )}
           </BoundingBox>,
