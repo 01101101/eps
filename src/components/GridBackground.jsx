@@ -12,7 +12,7 @@ export const GridBackground = () => {
         boxShadow: `inset 0 0 ${GridSize * 5}px ${GridSize * 2.5}px #000`,
         backgroundSize: `${GridSize}px ${GridSize}px`,
         backgroundImage:
-          'linear-gradient(to right, var(--color-neutral-800) 1px, transparent 1px), linear-gradient(to bottom, var(--color-neutral-800) 1px, transparent 1px)',
+          'linear-gradient(to right, var(--color-active) 1px, transparent 1px), linear-gradient(to bottom, var(--color-active) 1px, transparent 1px)',
       }}
     />
   );

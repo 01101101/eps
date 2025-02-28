@@ -6,7 +6,7 @@ export const ToolBar = () => {
   const isLocked = useWorkbench((state) => state.isLocked);
 
   const handleToggleLocking = () => {
-    useWorkbench.setState({ isLocked: !isLocked });
+    useWorkbench.setState({ isLocked: !isLocked, activeWidgetId: null });
   };
 
   return (

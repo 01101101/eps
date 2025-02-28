@@ -1,9 +1,9 @@
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { GridSize } from '~/components/GridBackground';
+import { useWorkbench } from '~/components/Workbench';
 import { cx } from '~/utils/css';
-import { useWorkbench } from './Workbench';
 
-export const ResizeHandle = ({ className, size, onResize, coefficient = 1 }) => {
+export const ResizeHandle = ({ className, size, onResize, onResizeStart, onResizeEnd, coefficient = 1 }) => {
   const abortControllerRef = useRef();
 
   const startRef = useRef(null);
@@ -12,6 +12,7 @@ export const ResizeHandle = ({ className, size, onResize, coefficient = 1 }) => 
     abortControllerRef.current.abort();
     target.releasePointerCapture(pointerId);
     startRef.current = null;
+    onResizeEnd?.();
   };
 
   const handlePointerMove = ({ clientX, clientY }) => {
@@ -27,13 +28,14 @@ export const ResizeHandle = ({ className, size, onResize, coefficient = 1 }) => 
     target.addEventListener('pointermove', handlePointerMove, { signal: abortControllerRef.current.signal });
     target.setPointerCapture(pointerId);
     startRef.current = { size, x: clientX, y: clientY };
+    onResizeStart?.();
   };
 
   return (
     <div
       className={cx(
         'absolute right-0 bottom-0 h-2 w-2 translate-x-[calc(50%-1px)] translate-y-[calc(50%-1px)] cursor-nwse-resize rounded-xs',
-        className ?? 'bg-neutral-700'
+        className ?? 'bg-border'
       )}
       onPointerDown={handlePointerDown}></div>
   );
@@ -50,6 +52,7 @@ export const BoundingBox = ({ id, size, position, children, className }) => {
 
   const [activePosition, setActivePosition] = useState();
   const [isDragging, setIsDragging] = useState();
+  const [isResizing, setIsResizing] = useState();
 
   const currentPosition = activePosition ?? position;
 
@@ -57,6 +60,10 @@ export const BoundingBox = ({ id, size, position, children, className }) => {
     useWorkbench.setState((state) => {
       state.widgets.find((widget) => widget.id === id).size = size;
     });
+  };
+
+  const handleIsResizing = (isResizing) => () => {
+    setIsResizing(isResizing);
   };
 
   const handleClick = (event) => {
@@ -75,7 +82,7 @@ export const BoundingBox = ({ id, size, position, children, className }) => {
     return { x: Math.max(0, Math.min(gridX, maxX)), y: Math.max(0, Math.min(gridY, maxY)) };
   };
 
-  const handlePointerUp = ({ clientX, clientY, target, pointerId }) => {
+  const handlePointerUp = ({ target, pointerId }) => {
     setIsDragging(false);
     abortControllerRef.current.abort();
     target.style.cursor = 'grab';
@@ -91,8 +98,8 @@ export const BoundingBox = ({ id, size, position, children, className }) => {
   };
 
   const handlePointerMove = ({ clientX, clientY }) => {
-    const element = document.elementFromPoint(clientX, clientY);
-    if (element === workbenchElement) {
+    const element = document.elementsFromPoint(clientX, clientY).find((element) => element === workbenchElement);
+    if (element != null) {
       setActivePosition({ type: 'relative', ...computeRelativePosition(clientX, clientY) });
     } else {
       const workbenchBounds = workbenchElement.getBoundingClientRect();
@@ -110,13 +117,32 @@ export const BoundingBox = ({ id, size, position, children, className }) => {
     target.addEventListener('pointerup', handlePointerUp, { signal: abortControllerRef.current.signal });
     target.addEventListener('pointermove', handlePointerMove, { signal: abortControllerRef.current.signal });
     target.setPointerCapture(pointerId);
-    const workbenchBounds = workbenchElement.getBoundingClientRect();
-    const widgetLeft = position.x * GridSize + workbenchBounds.x;
-    const widgetTop = position.y * GridSize + workbenchBounds.y;
-    grabOffsetRef.current = { x: clientX - widgetLeft, y: clientY - widgetTop };
-    setActivePosition({ type: 'relative', x: position.x, y: position.y });
+    const element = document.elementsFromPoint(clientX, clientY).find((element) => element === workbenchElement);
+    if (element != null) {
+      const workbenchBounds = workbenchElement.getBoundingClientRect();
+      const widgetLeft = position.x * GridSize + workbenchBounds.x;
+      const widgetTop = position.y * GridSize + workbenchBounds.y;
+      grabOffsetRef.current = { x: clientX - widgetLeft, y: clientY - widgetTop };
+      setActivePosition({ type: 'relative', x: position.x, y: position.y });
+    } else {
+      const workbenchBounds = workbenchElement.getBoundingClientRect();
+      grabOffsetRef.current = { x: (size.width / 2) * GridSize, y: (size.height / 2) * GridSize };
+      setActivePosition({
+        type: 'absolute',
+        x: clientX - workbenchBounds.x - grabOffsetRef.current.x,
+        y: clientY - workbenchBounds.y - grabOffsetRef.current.y,
+      });
+    }
     setIsDragging(true);
   };
+
+  const handleRef = useCallback((element) => {
+    const pointerEvent = useWorkbench.getState().pointerEvent;
+    if (element != null && pointerEvent != null) {
+      useWorkbench.setState({ pointerEvent: null });
+      element.dispatchEvent(pointerEvent);
+    }
+  }, []);
 
   return (
     <div
@@ -134,14 +160,26 @@ export const BoundingBox = ({ id, size, position, children, className }) => {
       onClick={handleClick}>
       {children}
       {isDragging && currentPosition.type === 'relative' && (
-        <div className="flex w-full justify-center text-[10px]">
+        <div className="absolute -bottom-0.5 flex w-full translate-y-full justify-center text-[10px]">
           ({currentPosition.x},{currentPosition.y})
+        </div>
+      )}
+      {isResizing && (
+        <div className="absolute -bottom-0.5 flex w-full translate-y-full justify-center text-[10px]">
+          {size.width} x {size.height}
         </div>
       )}
       {isActive && (
         <>
-          <div className="absolute top-0 left-0 h-full w-full cursor-grab" onPointerDown={handlePointerDown} />
-          {!isDragging && <ResizeHandle className="bg-primary" size={size} onResize={handleResize}></ResizeHandle>}
+          <div ref={handleRef} className="absolute top-0 left-0 h-full w-full cursor-grab" onPointerDown={handlePointerDown} />
+          {!isDragging && (
+            <ResizeHandle
+              className="bg-primary"
+              size={size}
+              onResize={handleResize}
+              onResizeStart={handleIsResizing(true)}
+              onResizeEnd={handleIsResizing(false)}></ResizeHandle>
+          )}
         </>
       )}
     </div>

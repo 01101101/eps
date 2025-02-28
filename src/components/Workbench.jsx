@@ -15,8 +15,12 @@ export const useWorkbench = create(
         widgets: [],
         element: null,
         activeWidgetId: null,
+        pointerEvent: null,
       }),
-      { name: 'eps', partialize: (state) => Object.fromEntries(Object.entries(state).filter(([key]) => !['element', 'activeWidgetId'].includes(key))) }
+      {
+        name: 'eps',
+        partialize: (state) => Object.fromEntries(Object.entries(state).filter(([key]) => !['activeWidgetId', 'element', 'pointerEvent'].includes(key))),
+      }
     )
   )
 );
@@ -43,7 +47,7 @@ export const Workbench = () => {
   return (
     <div
       ref={handleRef}
-      className="relative flex h-full w-full rounded-sm border border-neutral-700"
+      className="border-border relative flex h-full w-full rounded-sm border"
       style={{ width: `${size.width * GridSize + 1}px`, height: `${size.height * GridSize + 1}px` }}
       onClick={handleClick}>
       {widgets.map((widget) => (
