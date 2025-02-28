@@ -7,3 +7,7 @@ export const Button = ({ label = 'Button' }) => {
 };
 
 Button.defaultSize = { width: 10, height: 4 };
+
+Button.properties = {
+  label: { type: 'string' },
+};

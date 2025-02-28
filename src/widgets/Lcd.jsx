@@ -9,3 +9,7 @@ export const Lcd = ({ value = 'ENSONIQ' }) => {
 };
 
 Lcd.defaultSize = { width: 28, height: 5 };
+
+Lcd.properties = {
+  value: { type: 'string' },
+};

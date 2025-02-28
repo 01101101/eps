@@ -15,7 +15,7 @@ export const ToolBox = () => {
 
   return (
     <div
-      className="border-border absolute -top-px -left-2 flex h-[calc(100%+2px)] w-44 -translate-x-full flex-col gap-1 overflow-y-auto rounded-sm border bg-black p-[10px]"
+      className="border-border absolute -top-px -left-2 flex h-[calc(100%+2px)] w-44 -translate-x-full flex-col gap-1 overflow-y-auto rounded-sm border bg-black p-2"
       style={{ scrollbarWidth: 'none' }}>
       {Object.keys(allWidgets)
         .filter((type) => !type.endsWith('Size'))
