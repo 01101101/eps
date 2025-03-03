@@ -1,8 +1,8 @@
-import { PropertiesBox } from '~/components/PropertiesBox';
-import { GridBackground } from './GridBackground';
-import { ToolBar } from './ToolBar';
-import { ToolBox } from './ToolBox';
-import { useWorkbench, Workbench } from './Workbench';
+import { GridBackground } from '~/app/GridBackground';
+import { ToolBar } from '~/app/ToolBar';
+import { ToolBox } from '~/app/ToolBox';
+import { WidgetPanel } from '~/app/WidgetPanel';
+import { useWorkbench, Workbench } from '~/app/Workbench';
 
 export const App = () => {
   const isLocked = useWorkbench((state) => state.isLocked);
@@ -14,7 +14,7 @@ export const App = () => {
       {!isLocked && <ToolBox />}
       <ToolBar />
       <Workbench />
-      {activeWidgetId != null && <PropertiesBox />}
+      {activeWidgetId != null && <WidgetPanel />}
     </div>
   );
 };

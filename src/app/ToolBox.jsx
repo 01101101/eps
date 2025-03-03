@@ -1,4 +1,4 @@
-import { useWorkbench } from '~/components/Workbench';
+import { useWorkbench } from '~/app/Workbench';
 import * as allWidgets from '~/widgets';
 
 export const ToolBox = () => {

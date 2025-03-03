@@ -2,24 +2,29 @@ import { useCallback } from 'react';
 import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { create } from 'zustand/react';
-import { BoundingBox, ResizeHandle } from '~/components/BoundingBox';
-import { GridSize } from '~/components/GridBackground';
+import { BoundingBox, ResizeHandle } from '~/app/BoundingBox';
+import { GridSize } from '~/app/GridBackground';
 import * as allWidgets from '~/widgets';
 
 export const useWorkbench = create(
   immer(
     persist(
-      () => ({
-        isLocked: true,
-        size: { width: 80, height: 60 },
-        widgets: [],
-        element: null,
-        activeWidgetId: null,
-        pointerEvent: null,
-      }),
+      () => {
+        const activeScreenId = crypto.randomUUID();
+        return {
+          isLocked: true,
+          size: { width: 80, height: 60 },
+          widgets: [],
+          screens: [{ id: activeScreenId }],
+          element: null,
+          activeScreenId,
+          activeWidgetId: null,
+          pointerEvent: null,
+        };
+      },
       {
         name: 'eps',
-        partialize: (state) => Object.fromEntries(Object.entries(state).filter(([key]) => !['activeWidgetId', 'element', 'pointerEvent'].includes(key))),
+        partialize: (state) => Object.fromEntries(Object.entries(state).filter(([key]) => !['element', 'pointerEvent'].includes(key))),
       }
     )
   )

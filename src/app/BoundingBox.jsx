@@ -1,12 +1,14 @@
-import { useCallback, useRef, useState } from 'react';
-import { GridSize } from '~/components/GridBackground';
-import { useWorkbench } from '~/components/Workbench';
+import { useCallback, experimental_useEffectEvent as useEffectEvent, useRef, useState } from 'react';
+import { GridSize } from '~/app/GridBackground';
+import { useWorkbench } from '~/app/Workbench';
 import { cx } from '~/utils/css';
 
 export const ResizeHandle = ({ className, size, onResize, onResizeStart, onResizeEnd, coefficient = 1 }) => {
   const abortControllerRef = useRef();
 
   const startRef = useRef(null);
+
+  useEffectEvent(() => {});
 
   const handlePointerUp = ({ target, pointerId }) => {
     abortControllerRef.current.abort();
@@ -82,20 +84,25 @@ export const BoundingBox = ({ id, size, position, children, className }) => {
     return { x: Math.max(0, Math.min(gridX, maxX)), y: Math.max(0, Math.min(gridY, maxY)) };
   };
 
-  const handlePointerUp = ({ target, pointerId }) => {
+  const handlePointerUp = useEffectEvent(({ target, pointerId }) => {
     setIsDragging(false);
     abortControllerRef.current.abort();
     target.style.cursor = 'grab';
     target.releasePointerCapture(pointerId);
-    setActivePosition((activePosition) => {
-      if (activePosition.type === 'relative') {
-        useWorkbench.setState((state) => {
-          state.widgets.find((widget) => widget.id === id).position = activePosition;
-        });
-      }
-      return null;
-    });
-  };
+    if (activePosition.type === 'relative') {
+      useWorkbench.setState((state) => {
+        const widget = state.widgets.find((widget) => widget.id === id);
+        widget.position = activePosition;
+        widget.screenId = state.activeScreenId;
+      });
+    } else {
+      useWorkbench.setState((state) => {
+        state.widgets = state.widgets.filter((widget) => widget.id !== id);
+        state.activeWidgetId = null;
+      });
+    }
+    setActivePosition(null);
+  });
 
   const handlePointerMove = ({ clientX, clientY }) => {
     const element = document.elementsFromPoint(clientX, clientY).find((element) => element === workbenchElement);
