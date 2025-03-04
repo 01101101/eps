@@ -48,7 +48,9 @@ export const WidgetPanel = () => {
 
   return (
     widget != null && (
-      <div className="border-border absolute -top-px -right-2 flex h-[calc(100%+2px)] w-80 translate-x-full flex-col overflow-y-auto rounded-sm border bg-black">
+      <div
+        className="border-border absolute -top-px -right-2 flex h-[calc(100%+2px)] w-80 translate-x-full flex-col overflow-y-auto rounded-sm border bg-black"
+        style={{ scrollbarWidth: 'none' }}>
         <Field id={widget.id} label="id" type="string" value={widget.id} />
         {Object.entries(widgetProps.properties).map(([key, { type }]) => (
           <Field key={key} id={widget.id} label={key} type={type} value={widget.properties?.[key]?.value} />

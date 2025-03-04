@@ -3,6 +3,7 @@ import * as allWidgets from '~/widgets';
 
 export const ToolBox = () => {
   const handlePointerDown = (type) => (event) => {
+    event.stopPropagation();
     const { target, pointerId, clientX, clientY } = event;
     const widget = allWidgets[type];
     useWorkbench.setState((state) => {

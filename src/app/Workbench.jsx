@@ -20,6 +20,8 @@ export const useWorkbench = create(
           activeScreenId,
           activeWidgetId: null,
           pointerEvent: null,
+          midiInput: null,
+          midiOutput: null,
         };
       },
       {
@@ -36,13 +38,24 @@ export const Workbench = () => {
   const widgets = useWorkbench((state) => state.widgets);
 
   const handleResize = (size) => {
-    useWorkbench.setState({ size });
-  };
-
-  const handleClick = () => {
-    if (!isLocked) {
-      useWorkbench.setState({ activeWidgetId: null });
-    }
+    useWorkbench.setState((state) => {
+      const { minWidth, minHeight } = state.widgets
+        .filter((widget) => widget.screenId === state.screens[0].id)
+        .reduce(
+          ({ minWidth, minHeight }, widget) => {
+            const widgetMinWidth = widget.position.x + widget.size.width;
+            const widgetMinHeight = widget.position.y + widget.size.height;
+            return { minWidth: Math.max(widgetMinWidth, minWidth), minHeight: Math.max(widgetMinHeight, minHeight) };
+          },
+          { minWidth: 0, minHeight: 0 }
+        );
+      return {
+        size: {
+          width: Math.max(size.width, minWidth),
+          height: Math.max(size.height, minHeight),
+        },
+      };
+    });
   };
 
   const handleRef = useCallback((element) => {
@@ -53,10 +66,9 @@ export const Workbench = () => {
     <div
       ref={handleRef}
       className="border-border relative flex h-full w-full rounded-sm border"
-      style={{ width: `${size.width * GridSize + 1}px`, height: `${size.height * GridSize + 1}px` }}
-      onClick={handleClick}>
+      style={{ width: `${size.width * GridSize + 1}px`, height: `${size.height * GridSize + 1}px` }}>
       {widgets.map((widget) => (
-        <BoundingBox key={widget.id} id={widget.id} size={widget.size} position={widget.position}>
+        <BoundingBox key={widget.id} id={widget.id} size={widget.size} defaultSize={allWidgets[widget.type].defaultSize} position={widget.position}>
           {allWidgets[widget.type]({ id: widget.id })}
         </BoundingBox>
       ))}

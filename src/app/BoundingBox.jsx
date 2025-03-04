@@ -1,5 +1,6 @@
 import { useCallback, experimental_useEffectEvent as useEffectEvent, useRef, useState } from 'react';
 import { GridSize } from '~/app/GridBackground';
+import { useOutsideClick } from '~/app/useOutsideClick';
 import { useWorkbench } from '~/app/Workbench';
 import { cx } from '~/utils/css';
 
@@ -24,7 +25,9 @@ export const ResizeHandle = ({ className, size, onResize, onResizeStart, onResiz
     onResize({ width: size.width + deltaX, height: size.height + deltaY });
   };
 
-  const handlePointerDown = ({ target, pointerId, clientX, clientY }) => {
+  const handlePointerDown = (event) => {
+    event.stopPropagation();
+    const { target, pointerId, clientX, clientY } = event;
     abortControllerRef.current = new AbortController();
     target.addEventListener('pointerup', handlePointerUp, { signal: abortControllerRef.current.signal });
     target.addEventListener('pointermove', handlePointerMove, { signal: abortControllerRef.current.signal });
@@ -43,7 +46,7 @@ export const ResizeHandle = ({ className, size, onResize, onResizeStart, onResiz
   );
 };
 
-export const BoundingBox = ({ id, size, position, children, className }) => {
+export const BoundingBox = ({ id, size, defaultSize, position, children, className }) => {
   const abortControllerRef = useRef();
 
   const grabOffsetRef = useRef();
@@ -58,9 +61,20 @@ export const BoundingBox = ({ id, size, position, children, className }) => {
 
   const currentPosition = activePosition ?? position;
 
+  const ref = useOutsideClick(
+    useCallback(() => {
+      if (!isLocked) {
+        useWorkbench.setState({ activeWidgetId: null });
+      }
+    }, [])
+  );
+
   const handleResize = (size) => {
     useWorkbench.setState((state) => {
-      state.widgets.find((widget) => widget.id === id).size = size;
+      state.widgets.find((widget) => widget.id === id).size = {
+        width: Math.min(Math.max(size.width, defaultSize.width), state.size.width - position.x),
+        height: Math.min(Math.max(size.height, defaultSize.height), state.size.height - position.y),
+      };
     });
   };
 
@@ -118,7 +132,9 @@ export const BoundingBox = ({ id, size, position, children, className }) => {
     }
   };
 
-  const handlePointerDown = ({ target, pointerId, clientX, clientY }) => {
+  const handlePointerDown = (event) => {
+    event.stopPropagation();
+    const { target, pointerId, clientX, clientY } = event;
     abortControllerRef.current = new AbortController();
     target.style.cursor = 'grabbing';
     target.addEventListener('pointerup', handlePointerUp, { signal: abortControllerRef.current.signal });
@@ -153,9 +169,10 @@ export const BoundingBox = ({ id, size, position, children, className }) => {
 
   return (
     <div
+      ref={ref}
       className={cx(
         'absolute top-0 left-0 flex flex-col gap-0.5 rounded-sm border p-[2px]',
-        isActive && !isDragging ? 'border-primary' : 'border-transparent',
+        isActive ? 'border-primary' : 'border-transparent',
         activePosition != null && 'pointer-events-none',
         className
       )}
@@ -179,14 +196,13 @@ export const BoundingBox = ({ id, size, position, children, className }) => {
       {isActive && (
         <>
           <div ref={handleRef} className="absolute top-0 left-0 h-full w-full cursor-grab" onPointerDown={handlePointerDown} />
-          {!isDragging && (
-            <ResizeHandle
-              className="bg-primary"
-              size={size}
-              onResize={handleResize}
-              onResizeStart={handleIsResizing(true)}
-              onResizeEnd={handleIsResizing(false)}></ResizeHandle>
-          )}
+          <ResizeHandle
+            className="bg-primary"
+            size={size}
+            onResize={handleResize}
+            onResizeStart={handleIsResizing(true)}
+            onResizeEnd={handleIsResizing(false)}
+          />
         </>
       )}
     </div>
