@@ -15,5 +15,6 @@ export default defineConfig(() => ({
   build: {
     outDir: resolve(import.meta.dirname, 'build'),
     emptyOutDir: true,
+    sourcemap: true,
   },
 }));
