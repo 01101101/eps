@@ -9,7 +9,13 @@ export const ToolBox = () => {
     useWorkbench.setState((state) => {
       const id = crypto.randomUUID();
       state.pointerEvent = new PointerEvent('pointerdown', { bubbles: true, target, pointerId, clientX, clientY });
-      state.widgets.push({ id, type, position: { type: 'absolute', x: 0, y: 0 }, size: widget.defaultSize });
+      state.widgets.push({
+        id,
+        type,
+        position: { type: 'absolute', x: 0, y: 0 },
+        size: widget.defaultSize,
+        properties: Object.fromEntries(Object.entries(widget.properties).map(([name, property]) => [name, property.default])),
+      });
       state.activeWidgetId = id;
     });
   };

@@ -69,7 +69,7 @@ export const Workbench = () => {
       style={{ width: `${size.width * GridSize + 1}px`, height: `${size.height * GridSize + 1}px` }}>
       {widgets.map((widget) => (
         <BoundingBox key={widget.id} id={widget.id} size={widget.size} defaultSize={allWidgets[widget.type].defaultSize} position={widget.position}>
-          {allWidgets[widget.type]({ id: widget.id })}
+          {allWidgets[widget.type]({ id: widget.id, ...widget.properties })}
         </BoundingBox>
       ))}
       {!isLocked && <ResizeHandle size={size} onResize={handleResize} coefficient={2} />}

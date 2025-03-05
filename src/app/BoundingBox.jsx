@@ -3,6 +3,7 @@ import { GridSize } from '~/app/GridBackground';
 import { useOutsideClick } from '~/app/useOutsideClick';
 import { useWorkbench } from '~/app/Workbench';
 import { cx } from '~/utils/css';
+import * as allWidgets from '~/widgets';
 
 export const ResizeHandle = ({ className, size, onResize, onResizeStart, onResizeEnd, coefficient = 1 }) => {
   const abortControllerRef = useRef();
@@ -71,10 +72,10 @@ export const BoundingBox = ({ id, size, defaultSize, position, children, classNa
 
   const handleResize = (size) => {
     useWorkbench.setState((state) => {
-      state.widgets.find((widget) => widget.id === id).size = {
-        width: Math.min(Math.max(size.width, defaultSize.width), state.size.width - position.x),
-        height: Math.min(Math.max(size.height, defaultSize.height), state.size.height - position.y),
-      };
+      const widget = state.widgets.find((widget) => widget.id === id);
+      const width = Math.min(Math.max(size.width, defaultSize.width), state.size.width - position.x);
+      const height = Math.min(Math.max(allWidgets[widget.type].keepAspectRatio ? width : size.height, defaultSize.height), state.size.height - position.y);
+      widget.size = { width: allWidgets[widget.type].keepAspectRatio ? height : width, height };
     });
   };
 
@@ -171,7 +172,7 @@ export const BoundingBox = ({ id, size, defaultSize, position, children, classNa
     <div
       ref={ref}
       className={cx(
-        'absolute top-0 left-0 flex flex-col gap-0.5 rounded-sm border p-[2px]',
+        'absolute top-0 left-0 flex flex-col justify-center gap-0.5 rounded-sm border p-[2px]',
         isActive ? 'border-primary' : 'border-transparent',
         activePosition != null && 'pointer-events-none',
         className
@@ -193,7 +194,7 @@ export const BoundingBox = ({ id, size, defaultSize, position, children, classNa
           {size.width} x {size.height}
         </div>
       )}
-      {isActive && (
+      {isActive ? (
         <>
           <div ref={handleRef} className="absolute top-0 left-0 h-full w-full cursor-grab" onPointerDown={handlePointerDown} />
           <ResizeHandle
@@ -204,6 +205,13 @@ export const BoundingBox = ({ id, size, defaultSize, position, children, classNa
             onResizeEnd={handleIsResizing(false)}
           />
         </>
+      ) : (
+        !isLocked && (
+          <div
+            className="hover:border-primary absolute -top-px -left-px h-[calc(100%+2px)] w-[calc(100%+2px)] cursor-pointer rounded-sm border border-transparent"
+            onClick={handleClick}
+          />
+        )
       )}
     </div>
   );
