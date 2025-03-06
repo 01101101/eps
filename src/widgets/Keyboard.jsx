@@ -34,24 +34,26 @@ export const Keyboard = ({ size }) => {
   };
 
   return (
-    <div className="border-border flex h-full gap-px rounded-sm border bg-black" onPointerOut={handlePointerOut}>
-      {AllNotes.slice(0, AllNotes.findIndex(({ whiteIndex }) => whiteIndex === size.width) + 1).map(({ name, isWhite, whiteIndex }, index) =>
-        isWhite ? (
-          <div
-            key={name}
-            onPointerOver={handlePointerOver(name)}
-            className="hover:bg-primary first:rounded-tl-sm-internal first:rounded-bl-sm-internal last:rounded-tr-sm-internal last:rounded-br-sm-internal bg-white"
-            style={{ minWidth: `${GridSize - 1}px` }}
-          />
-        ) : (
-          <div
-            key={name}
-            onPointerOver={handlePointerOver(name)}
-            className="hover:bg-primary absolute h-1/2 rounded-b-xs bg-black"
-            style={{ width: `${GridSize - 1}px`, left: `${whiteIndex * (GridSize - 1) + whiteIndex - 1}px` }}
-          />
-        )
-      )}
+    <div className="border-border h-full rounded-sm border bg-black" onPointerOut={handlePointerOut}>
+      <div className="flex h-full gap-px">
+        {AllNotes.slice(0, AllNotes.findIndex(({ whiteIndex }) => whiteIndex === size.width) + 1).map(({ name, isWhite, whiteIndex }, index) =>
+          isWhite ? (
+            <div
+              key={name}
+              onPointerOver={handlePointerOver(name)}
+              className="hover:bg-primary first:rounded-tl-sm-internal first:rounded-bl-sm-internal last:rounded-tr-sm-internal last:rounded-br-sm-internal bg-white"
+              style={{ minWidth: `${GridSize - 1}px` }}
+            />
+          ) : (
+            <div
+              key={name}
+              onPointerOver={handlePointerOver(name)}
+              className="hover:bg-primary absolute h-1/2 rounded-b-xs bg-black"
+              style={{ width: `${GridSize - 1}px`, left: `${whiteIndex * (GridSize - 1) + whiteIndex - 1}px` }}
+            />
+          )
+        )}
+      </div>
       {note != null && <div className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 translate-y-full text-[10px]">{note}</div>}
     </div>
   );
