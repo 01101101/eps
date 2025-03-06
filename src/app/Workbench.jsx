@@ -67,11 +67,14 @@ export const Workbench = () => {
       ref={handleRef}
       className="border-border relative flex h-full w-full rounded-sm border"
       style={{ width: `${size.width * GridSize + 1}px`, height: `${size.height * GridSize + 1}px` }}>
-      {widgets.map((widget) => (
-        <BoundingBox key={widget.id} id={widget.id} size={widget.size} defaultSize={allWidgets[widget.type].defaultSize} position={widget.position}>
-          {allWidgets[widget.type]({ id: widget.id, ...widget.properties })}
-        </BoundingBox>
-      ))}
+      {widgets.map((widget) => {
+        const Widget = allWidgets[widget.type];
+        return (
+          <BoundingBox key={widget.id} id={widget.id} size={widget.size} position={widget.position}>
+            <Widget id={widget.id} size={widget.size} {...widget.properties} />
+          </BoundingBox>
+        );
+      })}
       {!isLocked && <ResizeHandle size={size} onResize={handleResize} coefficient={2} />}
     </div>
   );

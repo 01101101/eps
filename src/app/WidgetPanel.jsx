@@ -67,7 +67,7 @@ const Event = ({ name }) => {
 
 export const WidgetPanel = () => {
   const widget = useWorkbench((state) => state.widgets.find(({ id, screenId }) => id === state.activeWidgetId && screenId === state.activeScreenId));
-  const widgetProps = useMemo(() => allWidgets[widget?.type], [widget]);
+  const widgetTemplate = useMemo(() => allWidgets[widget?.type], [widget]);
 
   return (
     widget != null && (
@@ -75,11 +75,11 @@ export const WidgetPanel = () => {
         className="border-border absolute -top-px -right-2 flex h-[calc(100%+2px)] w-80 translate-x-full flex-col overflow-y-auto rounded-sm border bg-black py-2"
         style={{ scrollbarWidth: 'none' }}
         onPointerDown={stopPropagation}>
-        {Object.entries(widgetProps.properties).map(([key, { type }]) => (
+        {Object.entries(widgetTemplate.properties).map(([key, { type }]) => (
           <Field key={key} id={widget.id} label={key} type={type} value={widget.properties[key]} />
         ))}
         <div className="bg-border mt-0.5 h-px w-full" />
-        {Object.entries(widgetProps.events).map(([name, {}]) => (
+        {Object.entries(widgetTemplate.events).map(([name, {}]) => (
           <Event key={name} name={name} />
         ))}
       </div>

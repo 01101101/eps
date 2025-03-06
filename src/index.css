@@ -11,4 +11,5 @@
     --color-primary: #00ffff;
     --font-lcd: 'LCD';
     --font-sans: 'JetBrains Mono Variable';
+    --radius-sm-internal: calc(var(--radius-sm) - 1px);
 }

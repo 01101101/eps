@@ -47,7 +47,7 @@ export const ResizeHandle = ({ className, size, onResize, onResizeStart, onResiz
   );
 };
 
-export const BoundingBox = ({ id, size, defaultSize, position, children, className }) => {
+export const BoundingBox = ({ id, size, position, children, className }) => {
   const abortControllerRef = useRef();
 
   const grabOffsetRef = useRef();
@@ -73,9 +73,14 @@ export const BoundingBox = ({ id, size, defaultSize, position, children, classNa
   const handleResize = (size) => {
     useWorkbench.setState((state) => {
       const widget = state.widgets.find((widget) => widget.id === id);
-      const width = Math.min(Math.max(size.width, defaultSize.width), state.size.width - position.x);
-      const height = Math.min(Math.max(allWidgets[widget.type].keepAspectRatio ? width : size.height, defaultSize.height), state.size.height - position.y);
-      widget.size = { width: allWidgets[widget.type].keepAspectRatio ? height : width, height };
+      const { defaultSize, keepAspectRatio, maximumWidth, maximumHeight } = allWidgets[widget.type];
+      const aspectRatio = defaultSize.width / defaultSize.height;
+      const width = Math.min(Math.min(Math.max(size.width, defaultSize.width), maximumWidth ?? Infinity), state.size.width - position.x);
+      const height = Math.min(
+        Math.min(Math.max(keepAspectRatio ? width / aspectRatio : size.height, defaultSize.height), maximumHeight ?? Infinity),
+        state.size.height - position.y
+      );
+      widget.size = { width: keepAspectRatio ? height * aspectRatio : width, height };
     });
   };
 
