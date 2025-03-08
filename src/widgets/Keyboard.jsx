@@ -61,6 +61,9 @@ export const Keyboard = ({ size }) => {
 
 Keyboard.defaultSize = { width: 10, height: 4 };
 
+Keyboard.minimumWidth = 10;
+Keyboard.minimumHeight = 4;
+
 Keyboard.maximumWidth = 52;
 Keyboard.maximumHeight = 4;
 

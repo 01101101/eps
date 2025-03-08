@@ -72,11 +72,11 @@ export const Widget = ({ id, screenId, size, position, children, className }) =>
   const handleResize = (size) => {
     useWorkbench.setState((state) => {
       const widget = state.widgets.find((widget) => widget.id === id);
-      const { defaultSize, keepAspectRatio, maximumWidth, maximumHeight } = allWidgets[widget.type];
+      const { defaultSize, keepAspectRatio, minimumWidth, minimumHeight, maximumWidth, maximumHeight } = allWidgets[widget.type];
       const aspectRatio = defaultSize.width / defaultSize.height;
-      const width = Math.min(Math.min(Math.max(size.width, defaultSize.width), maximumWidth ?? Infinity), state.size.width - position.x);
+      const width = Math.min(Math.min(Math.max(size.width, minimumWidth), maximumWidth ?? Infinity), state.size.width - position.x);
       const height = Math.min(
-        Math.min(Math.max(keepAspectRatio ? width / aspectRatio : size.height, defaultSize.height), maximumHeight ?? Infinity),
+        Math.min(Math.max(keepAspectRatio ? width / aspectRatio : size.height, minimumHeight), maximumHeight ?? Infinity),
         state.size.height - position.y
       );
       widget.size = { width: keepAspectRatio ? height * aspectRatio : width, height };

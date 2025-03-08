@@ -10,6 +10,9 @@ export const Lcd = ({ value }) => {
 
 Lcd.defaultSize = { width: 15, height: 5 };
 
+Lcd.minimumWidth = 5;
+Lcd.minimumHeight = 5;
+
 Lcd.maximumHeight = 5;
 
 Lcd.properties = {

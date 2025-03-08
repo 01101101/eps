@@ -17,6 +17,9 @@ export const Knob = ({ value, minimum, maximum }) => {
 
 Knob.defaultSize = { width: 4, height: 4 };
 
+Knob.minimumWidth = 4;
+Knob.minimumHeight = 4;
+
 Knob.keepAspectRatio = true;
 
 Knob.properties = {

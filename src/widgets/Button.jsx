@@ -14,6 +14,9 @@ export const Button = ({ label, onAction }) => {
 
 Button.defaultSize = { width: 9, height: 4 };
 
+Button.minimumWidth = 4;
+Button.minimumHeight = 4;
+
 Button.properties = {
   label: { type: 'string', default: 'Button' },
 };
