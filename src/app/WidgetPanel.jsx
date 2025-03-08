@@ -1,4 +1,4 @@
-import { Plus, Target, X, Zap } from 'lucide-react';
+import { Crosshair, List, Plus, X, Zap } from 'lucide-react';
 import { useCallback, useMemo } from 'react';
 import { Select } from '~/app/Select';
 import { useWorkbench } from '~/app/Workbench';
@@ -21,8 +21,9 @@ const StringProperty = ({ id, name, value, template: { pattern, transform } }) =
 
   return (
     <textarea
-      className="focus:bg-active hover:bg-active line-clamp-1 field-sizing-content resize-none rounded-sm border border-transparent px-1 py-0.5 outline-none focus:line-clamp-none"
+      className="focus:bg-active hover:bg-active line-clamp-1 field-sizing-content resize-none rounded-sm border border-transparent px-1 py-0.5 outline-none placeholder:text-neutral-500 focus:line-clamp-none"
       value={value}
+      placeholder="empty"
       onChange={handleChange}
     />
   );
@@ -123,19 +124,41 @@ const SetAction = ({ id, event, action }) => {
     delete document.querySelector(`[data-id="${action.properties.target}"]`).dataset.focused;
   };
 
+  const handleChangeProperty = (property) => {
+    useWorkbench.setState((state) => {
+      const widget = state.widgets.find((widget) => widget.id === id);
+      const stateEvent = widget.events.find(({ id }) => id === event.id);
+      stateEvent.action.properties.property = property;
+    });
+  };
+
   return (
-    <div className="flex gap-1">
-      <Target className="h-4 w-4 p-0.5" />
-      <div
-        className={cx(
-          'before:bg-active relative cursor-pointer before:absolute before:-top-0.5 before:-left-1 before:z-[-1] before:hidden before:h-[calc(100%+0.25rem)] before:w-[calc(100%+0.5rem)] before:rounded-sm hover:before:block',
-          target == null && 'text-neutral-700 hover:text-neutral-500'
-        )}
-        onClick={handleClick}
-        onPointerOver={handlePointerOver}
-        onPointerOut={handlePointerOut}>
-        {target?.type ?? 'empty'}
+    <div className="flex flex-col gap-1">
+      <div className="flex gap-1">
+        <Crosshair className="h-4 w-4 p-0.5" />
+        <div
+          className={cx(
+            'before:bg-active relative cursor-pointer before:absolute before:-top-0.5 before:-left-1 before:z-[-1] before:hidden before:h-[calc(100%+0.25rem)] before:w-[calc(100%+0.5rem)] before:rounded-sm hover:before:block',
+            target == null && 'text-neutral-700 hover:text-neutral-500'
+          )}
+          onClick={handleClick}
+          onPointerOver={handlePointerOver}
+          onPointerOut={handlePointerOut}>
+          {target?.type ?? 'empty'}
+        </div>
       </div>
+      {target != null && (
+        <div className="relative flex gap-1">
+          <List className="h-4 w-4 p-0.5" />
+          <Select value={action.properties.property} onChange={handleChangeProperty}>
+            {Object.keys(allWidgets[target.type].properties).map((name) => (
+              <Select.Option key={name} value={name}>
+                {name}
+              </Select.Option>
+            ))}
+          </Select>
+        </div>
+      )}
     </div>
   );
 };

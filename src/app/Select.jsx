@@ -26,7 +26,7 @@ const Select = ({ value, onChange, children }) => {
   const { element, index } = useMemo(() => {
     const childrenArray = Children.toArray(children);
     const index = childrenArray.findIndex(({ props }) => props.value === value);
-    return { index: index !== -1 ? index : null, element: index !== -1 ? cloneElement(childrenArray[index], { isVisible: true }) : null };
+    return { index: index !== -1 ? index : 0, element: index !== -1 ? cloneElement(childrenArray[index], { isVisible: true }) : null };
   }, [children]);
 
   const ref = useOutsideClick(useCallback(() => setIsActive(false), []));
@@ -53,7 +53,7 @@ const Select = ({ value, onChange, children }) => {
         <div
           ref={ref}
           className="border-border absolute z-10 flex min-w-full -translate-x-[calc(0.5rem-1px)] -translate-y-[calc(0.375rem-1px)] flex-col gap-0.5 rounded-sm border bg-black p-0.5 whitespace-nowrap"
-          style={{ top: `calc(${index ?? 0} * -1.5rem + ${(index ?? 0) !== 0 ? 2 : 0}px)` }}>
+          style={{ top: `calc(${index} * -1.5rem + ${index * 2}px)` }}>
           {Children.map(children, (child) => cloneElement(child, { isSelected: value === child.props.value, onSelect: handleSelect(child.props.value) }))}
         </div>
       )}
