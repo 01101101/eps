@@ -88,6 +88,11 @@ export const Workbench = () => {
                 target.properties[action.properties.property]--;
                 break;
               }
+              case 'random': {
+                // TODO use transformer if present
+                target.properties[action.properties.property] = Math.random();
+                break;
+              }
               default:
             }
             break;
