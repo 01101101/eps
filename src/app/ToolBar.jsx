@@ -30,12 +30,12 @@ export const ToolBar = () => {
   return (
     <div
       className={cx(
-        'absolute right-0 -bottom-[calc(0.5rem-1px)] left-0 flex translate-y-full justify-between',
+        'absolute right-0 -bottom-[calc(0.5rem-1px)] left-0 flex translate-y-full items-start justify-between',
         focusedScreenId != null && 'pointer-events-none opacity-30'
       )}>
       {isLocked ? (
-        <div className="text-xs">
-          <div className="flex items-center gap-1">
+        <div className="flex flex-col text-xs">
+          <div className="flex items-center">
             <span className="text-neutral-500">MIDI In</span>
             <Select value={input} onChange={handleChangeInput}>
               {inputs.map((input) => (
@@ -45,7 +45,7 @@ export const ToolBar = () => {
               ))}
             </Select>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center">
             <span className="text-neutral-500">MIDI Out</span>
             <Select value={output} onChange={handleChangeOutput}>
               {outputs.map((output) => (

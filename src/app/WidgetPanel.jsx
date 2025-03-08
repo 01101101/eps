@@ -1,4 +1,4 @@
-import { Crosshair, List, Plus, X, Zap } from 'lucide-react';
+import { Crosshair, List, Plus, TextCursorInput, X, Zap } from 'lucide-react';
 import { useCallback, useMemo } from 'react';
 import { Select } from '~/app/Select';
 import { useWorkbench } from '~/app/Workbench';
@@ -6,22 +6,19 @@ import { cx } from '~/utils/css';
 import { stopPropagation } from '~/utils/events';
 import * as allWidgets from '~/widgets';
 
-const StringProperty = ({ id, name, value, template: { pattern, transform } }) => {
+const StringProperty = ({ value, onChange, template: { pattern, transform } }) => {
   const patternRegex = useMemo(() => (pattern != null ? new RegExp(pattern) : null), [pattern]);
 
   const handleChange = (event) => {
     const transformedValue = transform != null ? transform(event.target.value) : event.target.value;
     if (patternRegex == null || patternRegex.test(transformedValue)) {
-      useWorkbench.setState((state) => {
-        const widget = state.widgets.find((widget) => widget.id === id);
-        widget.properties[name] = transformedValue;
-      });
+      onChange(transformedValue);
     }
   };
 
   return (
     <textarea
-      className="focus:bg-active hover:bg-active line-clamp-1 field-sizing-content resize-none rounded-sm border border-transparent px-1 py-0.5 outline-none placeholder:text-neutral-500 focus:line-clamp-none"
+      className="focus:bg-active hover:bg-active line-clamp-1 field-sizing-content resize-none rounded-sm px-1 py-0.5 outline-none placeholder:text-neutral-500 focus:line-clamp-none"
       value={value}
       placeholder="empty"
       onChange={handleChange}
@@ -29,17 +26,14 @@ const StringProperty = ({ id, name, value, template: { pattern, transform } }) =
   );
 };
 
-const NumberProperty = ({ id, name, value }) => {
+const NumberProperty = ({ value, onChange }) => {
   const handleChange = (event) => {
-    useWorkbench.setState((state) => {
-      const widget = state.widgets.find((widget) => widget.id === id);
-      widget.properties[name] = Number(event.target.value);
-    });
+    onChange(Number(event.target.value));
   };
 
   return (
     <input
-      className="focus:bg-active hover:bg-active appearance-none rounded-sm border border-transparent px-1 py-0.5 outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+      className="focus:bg-active hover:bg-active w-full appearance-none rounded-sm px-1 py-0.5 outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
       type="number"
       value={value}
       onChange={handleChange}
@@ -54,10 +48,18 @@ const Properties = {
 
 const Property = ({ id, name, value, template }) => {
   const PropertyComponent = Properties[template.type];
+
+  const handleChange = (value) => {
+    useWorkbench.setState((state) => {
+      const widget = state.widgets.find((widget) => widget.id === id);
+      widget.properties[name] = value;
+    });
+  };
+
   return (
     <div className="flex flex-col px-2 py-0.5">
       <div className="text-border px-1 uppercase">{name}</div>
-      <PropertyComponent id={id} name={name} value={value} template={template} />
+      <PropertyComponent value={value} onChange={handleChange} template={template} />
     </div>
   );
 };
@@ -86,6 +88,18 @@ const SetAction = ({ id, event, action }) => {
     () => (action.properties.target != null ? useWorkbench.getState().widgets.find((widget) => widget.id === action.properties.target) : null),
     [action.properties.target]
   );
+
+  const PropertyComponent = Properties[allWidgets[target?.type]?.properties[action.properties.property]?.type];
+
+  const getTypes = () => {
+    const type = allWidgets[target.type].properties[action.properties.property].type;
+    switch (type) {
+      case 'number':
+        return ['manual', 'increment', 'decrement', 'random'];
+      default:
+        return [];
+    }
+  };
 
   const handleFocusWidget = useCallback(({ detail: focusedWidgetId }) => {
     const state = useWorkbench.getState();
@@ -132,15 +146,29 @@ const SetAction = ({ id, event, action }) => {
     });
   };
 
+  const handleChangeType = (value) => {
+    useWorkbench.setState((state) => {
+      const widget = state.widgets.find((widget) => widget.id === id);
+      const stateEvent = widget.events.find(({ id }) => id === event.id);
+      stateEvent.action.properties.type = value;
+      stateEvent.action.properties.value = null;
+    });
+  };
+
+  const handleChangeValue = (value) => {
+    useWorkbench.setState((state) => {
+      const widget = state.widgets.find((widget) => widget.id === id);
+      const stateEvent = widget.events.find(({ id }) => id === event.id);
+      stateEvent.action.properties.value = value;
+    });
+  };
+
   return (
-    <div className="flex flex-col gap-1">
-      <div className="flex gap-1">
+    <div className="flex flex-col">
+      <div className="flex items-center">
         <Crosshair className="h-4 w-4 p-0.5" />
         <div
-          className={cx(
-            'before:bg-active relative cursor-pointer before:absolute before:-top-0.5 before:-left-1 before:z-[-1] before:hidden before:h-[calc(100%+0.25rem)] before:w-[calc(100%+0.5rem)] before:rounded-sm hover:before:block',
-            target == null && 'text-neutral-700 hover:text-neutral-500'
-          )}
+          className={cx('hover:bg-active relative cursor-pointer rounded-sm px-1 py-0.5', target == null && 'text-neutral-700 hover:text-neutral-500')}
           onClick={handleClick}
           onPointerOver={handlePointerOver}
           onPointerOut={handlePointerOut}>
@@ -148,7 +176,7 @@ const SetAction = ({ id, event, action }) => {
         </div>
       </div>
       {target != null && (
-        <div className="relative flex gap-1">
+        <div className="flex items-center">
           <List className="h-4 w-4 p-0.5" />
           <Select value={action.properties.property} onChange={handleChangeProperty}>
             {Object.keys(allWidgets[target.type].properties).map((name) => (
@@ -157,6 +185,23 @@ const SetAction = ({ id, event, action }) => {
               </Select.Option>
             ))}
           </Select>
+        </div>
+      )}
+      {action.properties.property != null && (
+        <div className="flex items-center">
+          <TextCursorInput className="h-4 w-4 p-0.5" />
+          <Select value={action.properties.type} onChange={handleChangeType}>
+            {getTypes(action).map((name) => (
+              <Select.Option key={name} value={name}>
+                {name}
+              </Select.Option>
+            ))}
+          </Select>
+          {action.properties.type === 'manual' && (
+            <div className="flex flex-1">
+              <PropertyComponent value={action.properties.value} onChange={handleChangeValue} />
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -193,11 +238,13 @@ const Event = ({ id, event }) => {
   };
 
   return (
-    <div className="border-border flex flex-col gap-1 border-b p-2">
+    <div className="border-border flex flex-col border-b p-2">
       <div className="flex justify-between">
-        <div className="flex items-center gap-1">
-          <Zap className="h-4 w-4 p-0.5" />
-          {event.name}{' '}
+        <div className="flex items-center">
+          <div className="flex gap-1">
+            <Zap className="h-4 w-4 p-0.5" />
+            {event.name}
+          </div>
           <Select value={event.action?.name} onChange={handleChangeAction}>
             {Object.entries(Events[event.name]).map(([action]) => (
               <Select.Option key={action} value={action}>

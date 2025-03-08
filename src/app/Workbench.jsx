@@ -67,6 +67,37 @@ export const Workbench = () => {
     useWorkbench.setState({ element });
   }, []);
 
+  const handleAction = (id) => (event) => {
+    useWorkbench.setState((state) => {
+      const widget = state.widgets.find((widget) => widget.id === id);
+      const events = widget.events.filter(({ name }) => name === event);
+      events.forEach(({ action }) => {
+        switch (action.name) {
+          case 'set': {
+            const target = state.widgets.find((widget) => widget.id === action.properties.target);
+            switch (action.properties.type) {
+              case 'manual': {
+                target.properties[action.properties.property] = action.properties.value;
+                break;
+              }
+              case 'increment': {
+                target.properties[action.properties.property]++;
+                break;
+              }
+              case 'decrement': {
+                target.properties[action.properties.property]--;
+                break;
+              }
+              default:
+            }
+            break;
+          }
+          default:
+        }
+      });
+    });
+  };
+
   return (
     <div
       ref={handleRef}
@@ -76,7 +107,7 @@ export const Workbench = () => {
         const WidgetComponent = allWidgets[widget.type];
         return (
           <Widget key={widget.id} id={widget.id} screenId={widget.screenId} size={widget.size} position={widget.position}>
-            <WidgetComponent id={widget.id} size={widget.size} {...widget.properties} />
+            <WidgetComponent id={widget.id} size={widget.size} onAction={handleAction(widget.id)} {...widget.properties} />
           </Widget>
         );
       })}
