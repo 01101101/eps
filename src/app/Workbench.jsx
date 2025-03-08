@@ -2,8 +2,8 @@ import { useCallback } from 'react';
 import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { create } from 'zustand/react';
-import { BoundingBox, ResizeHandle } from '~/app/BoundingBox';
 import { GridSize } from '~/app/GridBackground';
+import { ResizeHandle, Widget } from '~/app/Widget';
 import * as allWidgets from '~/widgets';
 
 export const useWorkbench = create(
@@ -19,14 +19,17 @@ export const useWorkbench = create(
           element: null,
           activeScreenId,
           activeWidgetId: null,
+          focusedScreenId: null,
           pointerEvent: null,
           midiInput: null,
           midiOutput: null,
+          eventBus: new EventTarget(),
         };
       },
       {
         name: 'eps',
-        partialize: (state) => Object.fromEntries(Object.entries(state).filter(([key]) => !['element', 'pointerEvent'].includes(key))),
+        partialize: (state) =>
+          Object.fromEntries(Object.entries(state).filter(([key]) => !['element', 'pointerEvent', 'focusedScreenId', 'eventBus'].includes(key))),
       }
     )
   )
@@ -36,6 +39,8 @@ export const Workbench = () => {
   const isLocked = useWorkbench((state) => state.isLocked);
   const size = useWorkbench((state) => state.size);
   const widgets = useWorkbench((state) => state.widgets);
+
+  const focusedScreenId = useWorkbench((state) => state.focusedScreenId);
 
   const handleResize = (size) => {
     useWorkbench.setState((state) => {
@@ -68,14 +73,14 @@ export const Workbench = () => {
       className="border-border relative flex h-full w-full rounded-sm border"
       style={{ width: `${size.width * GridSize + 1}px`, height: `${size.height * GridSize + 1}px` }}>
       {widgets.map((widget) => {
-        const Widget = allWidgets[widget.type];
+        const WidgetComponent = allWidgets[widget.type];
         return (
-          <BoundingBox key={widget.id} id={widget.id} size={widget.size} position={widget.position}>
-            <Widget id={widget.id} size={widget.size} {...widget.properties} />
-          </BoundingBox>
+          <Widget key={widget.id} id={widget.id} screenId={widget.screenId} size={widget.size} position={widget.position}>
+            <WidgetComponent id={widget.id} size={widget.size} {...widget.properties} />
+          </Widget>
         );
       })}
-      {!isLocked && <ResizeHandle size={size} onResize={handleResize} coefficient={2} />}
+      {!isLocked && focusedScreenId == null && <ResizeHandle size={size} onResize={handleResize} coefficient={2} />}
     </div>
   );
 };

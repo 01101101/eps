@@ -39,15 +39,12 @@ export const ResizeHandle = ({ className, size, onResize, onResizeStart, onResiz
 
   return (
     <div
-      className={cx(
-        'absolute right-0 bottom-0 h-2 w-2 translate-x-[calc(50%-1px)] translate-y-[calc(50%-1px)] cursor-nwse-resize rounded-xs',
-        className ?? 'bg-border'
-      )}
+      className={cx('absolute right-0 bottom-0 h-2 w-2 translate-x-1/2 translate-y-1/2 cursor-nwse-resize rounded-xs', className ?? 'bg-border')}
       onPointerDown={handlePointerDown}></div>
   );
 };
 
-export const BoundingBox = ({ id, size, position, children, className }) => {
+export const Widget = ({ id, screenId, size, position, children, className }) => {
   const abortControllerRef = useRef();
 
   const grabOffsetRef = useRef();
@@ -55,6 +52,7 @@ export const BoundingBox = ({ id, size, position, children, className }) => {
   const workbenchElement = useWorkbench((state) => state.element);
   const isLocked = useWorkbench((state) => state.isLocked);
   const isActive = useWorkbench((state) => state.activeWidgetId === id);
+  const focusedScreenId = useWorkbench((state) => state.focusedScreenId);
 
   const [activePosition, setActivePosition] = useState();
   const [isDragging, setIsDragging] = useState();
@@ -64,7 +62,8 @@ export const BoundingBox = ({ id, size, position, children, className }) => {
 
   const ref = useOutsideClick(
     useCallback(() => {
-      if (!isLocked) {
+      const state = useWorkbench.getState();
+      if (!state.isLocked && state.focusedScreenId == null) {
         useWorkbench.setState({ activeWidgetId: null });
       }
     }, [])
@@ -88,10 +87,11 @@ export const BoundingBox = ({ id, size, position, children, className }) => {
     setIsResizing(isResizing);
   };
 
-  const handleClick = (event) => {
-    if (!isLocked) {
-      event.stopPropagation();
+  const handleClick = () => {
+    if (focusedScreenId == null) {
       useWorkbench.setState({ activeWidgetId: id });
+    } else {
+      useWorkbench.getState().eventBus.dispatchEvent(new CustomEvent('focusWidget', { detail: id }));
     }
   };
 
@@ -177,7 +177,7 @@ export const BoundingBox = ({ id, size, position, children, className }) => {
     <div
       ref={ref}
       className={cx(
-        'absolute top-0 left-0 flex flex-col justify-center gap-0.5 rounded-sm border p-[2px]',
+        'group absolute top-0 left-0 flex flex-col justify-center gap-0.5 rounded-sm border p-[2px]',
         isActive ? 'border-primary' : 'border-transparent',
         activePosition != null && 'pointer-events-none',
         className
@@ -187,7 +187,8 @@ export const BoundingBox = ({ id, size, position, children, className }) => {
         width: `${size.width * GridSize + 1 + 4 + 2}px`,
         height: `${size.height * GridSize + 1 + 4 + 2}px`,
       }}
-      onClick={handleClick}>
+      data-id={id}
+      data-screen-id={screenId}>
       {children}
       {isDragging && currentPosition.type === 'relative' && (
         <div className="absolute -bottom-0.5 flex w-full translate-y-full justify-center text-[10px]">
@@ -199,7 +200,7 @@ export const BoundingBox = ({ id, size, position, children, className }) => {
           {size.width} x {size.height}
         </div>
       )}
-      {isActive ? (
+      {isActive && focusedScreenId == null ? (
         <>
           <div ref={handleRef} className="absolute top-0 left-0 h-full w-full cursor-grab" onPointerDown={handlePointerDown} />
           <ResizeHandle
@@ -213,7 +214,10 @@ export const BoundingBox = ({ id, size, position, children, className }) => {
       ) : (
         !isLocked && (
           <div
-            className="hover:border-primary absolute -top-px -left-px h-[calc(100%+2px)] w-[calc(100%+2px)] cursor-pointer rounded-sm border border-transparent"
+            className={cx(
+              'absolute -top-px -left-px h-[calc(100%+2px)] w-[calc(100%+2px)] cursor-pointer rounded-sm border border-transparent',
+              focusedScreenId != null ? 'hover:bg-primary/30' : 'hover:border-primary group-data-[focused]:bg-primary/30'
+            )}
             onClick={handleClick}
           />
         )

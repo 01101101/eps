@@ -10,9 +10,10 @@ const Option = ({ onSelect, isVisible, isSelected, children }) => {
       className={cx(
         'group relative flex cursor-pointer items-center gap-1 rounded-sm',
         isSelected && 'bg-active',
-        isVisible ? '' : 'hover:bg-active px-1 py-0.5'
+        isVisible
+          ? 'before:bg-active before:absolute before:-top-0.5 before:-left-1 before:z-[-1] before:hidden before:h-[calc(100%+0.25rem)] before:w-[calc(100%+0.5rem)] before:rounded-sm hover:before:block'
+          : 'hover:bg-active px-1 py-0.5'
       )}>
-      {isVisible && <div className="group-hover:bg-active absolute -top-0.5 -left-1 z-[-1] h-[calc(100%+0.25rem)] w-[calc(100%+0.5rem)] rounded-sm"></div>}
       {children}
       {isVisible ? <ChevronDown className="h-3 w-3" /> : isSelected && <Check className="h-3 w-3" />}
     </div>
@@ -41,7 +42,13 @@ const Select = ({ value, onChange, children }) => {
 
   return (
     <div className="relative">
-      <div onClick={handleToggle}>{element ?? <div className="cursor-pointer text-neutral-700">Empty</div>}</div>
+      <div onClick={handleToggle}>
+        {element ?? (
+          <div className="before:bg-active cursor-pointer text-neutral-700 before:absolute before:-top-0.5 before:-left-1 before:z-[-1] before:hidden before:h-[calc(100%+0.25rem)] before:w-[calc(100%+0.5rem)] before:rounded-sm hover:text-neutral-500 hover:before:block">
+            empty
+          </div>
+        )}
+      </div>
       {isActive && (
         <div
           ref={ref}

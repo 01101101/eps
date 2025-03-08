@@ -3,9 +3,11 @@ import { Button } from '~/app/Button';
 import { Select } from '~/app/Select';
 import { useWorkbench } from '~/app/Workbench';
 import { useMidiStore } from '~/app/useMidi';
+import { cx } from '~/utils/css';
 
 export const ToolBar = () => {
   const isLocked = useWorkbench((state) => state.isLocked);
+  const focusedScreenId = useWorkbench((state) => state.focusedScreenId);
 
   const inputs = useMidiStore((state) => state.inputs);
   const outputs = useMidiStore((state) => state.outputs);
@@ -26,10 +28,14 @@ export const ToolBar = () => {
   };
 
   return (
-    <div className="absolute right-0 -bottom-2 left-0 flex translate-y-full justify-between">
+    <div
+      className={cx(
+        'absolute right-0 -bottom-[calc(0.5rem-1px)] left-0 flex translate-y-full justify-between',
+        focusedScreenId != null && 'pointer-events-none opacity-30'
+      )}>
       {isLocked ? (
         <div className="text-xs">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <span className="text-neutral-500">MIDI In</span>
             <Select value={input} onChange={handleChangeInput}>
               {inputs.map((input) => (
@@ -39,7 +45,7 @@ export const ToolBar = () => {
               ))}
             </Select>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <span className="text-neutral-500">MIDI Out</span>
             <Select value={output} onChange={handleChangeOutput}>
               {outputs.map((output) => (

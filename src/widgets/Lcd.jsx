@@ -1,4 +1,4 @@
-export const Lcd = ({ value = 'ENSONIQ' }) => {
+export const Lcd = ({ value }) => {
   return (
     <div
       className="font-lcd text-primary border-border flex h-full w-full rounded-sm border bg-black px-4 py-2 text-xl"
@@ -8,10 +8,12 @@ export const Lcd = ({ value = 'ENSONIQ' }) => {
   );
 };
 
-Lcd.defaultSize = { width: 28, height: 5 };
+Lcd.defaultSize = { width: 15, height: 5 };
+
+Lcd.maximumHeight = 5;
 
 Lcd.properties = {
-  value: { type: 'string' },
+  value: { type: 'string', pattern: "^[A-Z0-9%&'<>*+,\\-\\/=?@\\[\\\\\\]_{|} ]*$", transform: (value) => value.toUpperCase(), default: 'LCD' },
 };
 
 Lcd.events = {};
