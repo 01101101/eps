@@ -1,8 +1,8 @@
 import { useCallback, experimental_useEffectEvent as useEffectEvent, useRef, useState } from 'react';
 import { GridSize } from '~/app/GridBackground';
 import { useOutsideClick } from '~/app/useOutsideClick';
+import { cx } from '~/app/utils/css';
 import { useWorkbench } from '~/app/Workbench';
-import { cx } from '~/utils/css';
 import * as allWidgets from '~/widgets';
 
 export const ResizeHandle = ({ className, size, onResize, onResizeStart, onResizeEnd, coefficient = 1 }) => {

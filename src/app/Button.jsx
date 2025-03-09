@@ -1,4 +1,4 @@
-import { cx } from '~/utils/css';
+import { cx } from '~/app/utils/css';
 
 export const Button = ({ className, variant, onClick, children }) => {
   return (

@@ -1,5 +1,5 @@
 import { useWorkbench } from '~/app/Workbench';
-import { cx } from '~/utils/css';
+import { cx } from '~/app/utils/css';
 import * as allWidgets from '~/widgets';
 
 export const ToolBox = () => {

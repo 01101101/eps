@@ -80,20 +80,10 @@ export const Workbench = () => {
                 target.properties[action.properties.property] = action.properties.value;
                 break;
               }
-              case 'increment': {
-                target.properties[action.properties.property]++;
-                break;
+              default: {
+                const propertyTemplate = allWidgets[target.type].properties[action.properties.property];
+                target.properties[action.properties.property] = propertyTemplate.accepts[action.properties.type](target.properties);
               }
-              case 'decrement': {
-                target.properties[action.properties.property]--;
-                break;
-              }
-              case 'random': {
-                // TODO use transformer if present
-                target.properties[action.properties.property] = Math.random();
-                break;
-              }
-              default:
             }
             break;
           }

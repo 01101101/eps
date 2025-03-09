@@ -1,7 +1,7 @@
 import { Check, ChevronDown } from 'lucide-react';
 import { Children, cloneElement, useCallback, useMemo, useState } from 'react';
 import { useOutsideClick } from '~/app/useOutsideClick';
-import { cx } from '~/utils/css';
+import { cx } from '~/app/utils/css';
 
 const Option = ({ onSelect, isVisible, isSelected, children }) => {
   return (

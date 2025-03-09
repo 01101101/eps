@@ -1,7 +1,7 @@
 import { GridBackground } from '~/app/GridBackground';
 import { ToolBar } from '~/app/ToolBar';
 import { ToolBox } from '~/app/ToolBox';
-import { WidgetPanel } from '~/app/WidgetPanel';
+import { WidgetPanel } from '~/app/WidgetPanel/WidgetPanel';
 import { useWorkbench, Workbench } from '~/app/Workbench';
 import { useMidi } from '~/app/useMidi';
 

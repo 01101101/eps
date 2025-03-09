@@ -3,7 +3,7 @@ import { Button } from '~/app/Button';
 import { Select } from '~/app/Select';
 import { useWorkbench } from '~/app/Workbench';
 import { useMidiStore } from '~/app/useMidi';
-import { cx } from '~/utils/css';
+import { cx } from '~/app/utils/css';
 
 export const ToolBar = () => {
   const isLocked = useWorkbench((state) => state.isLocked);

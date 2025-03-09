@@ -2,7 +2,7 @@
 
 @font-face {
     font-family: "LCD";
-    src: url("~/assets/LCD.woff2") format("woff2");
+    src: url("~/app/assets/LCD.woff2") format("woff2");
 }
 
 @theme {
