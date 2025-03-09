@@ -18,7 +18,7 @@ const StringProperty = ({ value, onChange, template: { pattern, transform } }) =
 
   return (
     <textarea
-      className="focus:bg-active hover:bg-active line-clamp-1 field-sizing-content resize-none rounded-sm px-1 py-0.5 outline-none placeholder:text-neutral-500 focus:line-clamp-none"
+      className="focus:bg-active hover:bg-active line-clamp-1 field-sizing-content w-full resize-none rounded-sm px-1 py-0.5 outline-none placeholder:text-neutral-500 focus:line-clamp-none"
       value={value}
       placeholder="empty"
       onChange={handleChange}
@@ -58,7 +58,7 @@ const Property = ({ id, name, value, template }) => {
 
   return (
     <div className="flex flex-col px-2 py-0.5">
-      <div className="text-border px-1 uppercase">{name}</div>
+      <div className="text-border px-1 text-[10px] uppercase">{name}</div>
       <PropertyComponent value={value} onChange={handleChange} template={template} />
     </div>
   );
@@ -75,10 +75,10 @@ const AddEventButton = ({ id, name }) => {
   return (
     <div className="border-border hover:bg-active flex cursor-pointer justify-between border-b p-2" onClick={handleAddEvent}>
       <div className="flex items-center gap-1">
-        <Zap className="h-4 w-4 p-0.5" />
-        {name}
+        <Zap className="h-5 w-5 p-1" />
+        <div className="py-0.5">{name}</div>
       </div>
-      <Plus className="h-4 w-4 p-0.5" />
+      <Plus className="h-5 w-5 p-1" />
     </div>
   );
 };
@@ -89,13 +89,16 @@ const SetAction = ({ id, event, action }) => {
     [action.properties.target]
   );
 
-  const PropertyComponent = Properties[allWidgets[target?.type]?.properties[action.properties.property]?.type];
+  const propertyTemplate = allWidgets[target?.type]?.properties[action.properties.property];
+  const PropertyComponent = Properties[propertyTemplate?.type];
 
   const getTypes = () => {
     const type = allWidgets[target.type].properties[action.properties.property].type;
     switch (type) {
       case 'number':
         return ['manual', 'increment', 'decrement', 'random'];
+      case 'string':
+        return ['manual'];
       default:
         return [];
     }
@@ -166,7 +169,7 @@ const SetAction = ({ id, event, action }) => {
   return (
     <div className="flex flex-col">
       <div className="flex items-center">
-        <Crosshair className="h-4 w-4 p-0.5" />
+        <Crosshair className="h-5 w-5 p-1" />
         <div
           className={cx('hover:bg-active relative cursor-pointer rounded-sm px-1 py-0.5', target == null && 'text-neutral-700 hover:text-neutral-500')}
           onClick={handleClick}
@@ -177,7 +180,7 @@ const SetAction = ({ id, event, action }) => {
       </div>
       {target != null && (
         <div className="flex items-center">
-          <List className="h-4 w-4 p-0.5" />
+          <List className="h-5 w-5 p-1" />
           <Select value={action.properties.property} onChange={handleChangeProperty}>
             {Object.keys(allWidgets[target.type].properties).map((name) => (
               <Select.Option key={name} value={name}>
@@ -188,8 +191,8 @@ const SetAction = ({ id, event, action }) => {
         </div>
       )}
       {action.properties.property != null && (
-        <div className="flex items-center">
-          <TextCursorInput className="h-4 w-4 p-0.5" />
+        <div className="flex items-start">
+          <TextCursorInput className="h-5 w-5 p-1" />
           <Select value={action.properties.type} onChange={handleChangeType}>
             {getTypes(action).map((name) => (
               <Select.Option key={name} value={name}>
@@ -199,7 +202,7 @@ const SetAction = ({ id, event, action }) => {
           </Select>
           {action.properties.type === 'manual' && (
             <div className="flex flex-1">
-              <PropertyComponent value={action.properties.value} onChange={handleChangeValue} />
+              <PropertyComponent value={action.properties.value} template={propertyTemplate} onChange={handleChangeValue} />
             </div>
           )}
         </div>
@@ -242,8 +245,8 @@ const Event = ({ id, event }) => {
       <div className="flex justify-between">
         <div className="flex items-center">
           <div className="flex gap-1">
-            <Zap className="h-4 w-4 p-0.5" />
-            {event.name}
+            <Zap className="h-5 w-5 p-1" />
+            <div className="py-0.5">{event.name}</div>
           </div>
           <Select value={event.action?.name} onChange={handleChangeAction}>
             {Object.entries(Events[event.name]).map(([action]) => (
