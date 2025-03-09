@@ -1,10 +1,19 @@
-import { Crosshair, List, Plus, TextCursorInput, X, Zap } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import { useCallback, useMemo } from 'react';
 import { Select } from '~/app/Select';
 import { useWorkbench } from '~/app/Workbench';
 import { cx } from '~/utils/css';
 import { stopPropagation } from '~/utils/events';
 import * as allWidgets from '~/widgets';
+
+const Field = ({ label, children, className }) => {
+  return (
+    <div className="flex flex-col px-1 py-0.5">
+      <div className="text-border px-1 text-[10px] uppercase">{label}</div>
+      {children}
+    </div>
+  );
+};
 
 const StringProperty = ({ value, onChange, template: { pattern, transform } }) => {
   const patternRegex = useMemo(() => (pattern != null ? new RegExp(pattern) : null), [pattern]);
@@ -57,10 +66,9 @@ const Property = ({ id, name, value, template }) => {
   };
 
   return (
-    <div className="flex flex-col px-2 py-0.5">
-      <div className="text-border px-1 text-[10px] uppercase">{name}</div>
+    <Field label={name}>
       <PropertyComponent value={value} onChange={handleChange} template={template} />
-    </div>
+    </Field>
   );
 };
 
@@ -73,11 +81,8 @@ const AddEventButton = ({ id, name }) => {
   };
 
   return (
-    <div className="border-border hover:bg-active flex cursor-pointer justify-between border-b p-2" onClick={handleAddEvent}>
-      <div className="flex items-center gap-1">
-        <Zap className="h-5 w-5 p-1" />
-        <div className="py-0.5">{name}</div>
-      </div>
+    <div className="border-border hover:bg-active flex cursor-pointer justify-between border-b px-2 py-1" onClick={handleAddEvent}>
+      <div className="py-0.5">{name}</div>
       <Plus className="h-5 w-5 p-1" />
     </div>
   );
@@ -168,8 +173,7 @@ const SetAction = ({ id, event, action }) => {
 
   return (
     <div className="flex flex-col">
-      <div className="flex items-center">
-        <Crosshair className="h-5 w-5 p-1" />
+      <Field label="target">
         <div
           className={cx('hover:bg-active relative cursor-pointer rounded-sm px-1 py-0.5', target == null && 'text-neutral-700 hover:text-neutral-500')}
           onClick={handleClick}
@@ -177,10 +181,9 @@ const SetAction = ({ id, event, action }) => {
           onPointerOut={handlePointerOut}>
           {target?.type ?? 'empty'}
         </div>
-      </div>
+      </Field>
       {target != null && (
-        <div className="flex items-center">
-          <List className="h-5 w-5 p-1" />
+        <Field label="property">
           <Select value={action.properties.property} onChange={handleChangeProperty}>
             {Object.keys(allWidgets[target.type].properties).map((name) => (
               <Select.Option key={name} value={name}>
@@ -188,24 +191,25 @@ const SetAction = ({ id, event, action }) => {
               </Select.Option>
             ))}
           </Select>
-        </div>
+        </Field>
       )}
       {action.properties.property != null && (
-        <div className="flex items-start">
-          <TextCursorInput className="h-5 w-5 p-1" />
-          <Select value={action.properties.type} onChange={handleChangeType}>
-            {getTypes(action).map((name) => (
-              <Select.Option key={name} value={name}>
-                {name}
-              </Select.Option>
-            ))}
-          </Select>
-          {action.properties.type === 'manual' && (
-            <div className="flex flex-1">
-              <PropertyComponent value={action.properties.value} template={propertyTemplate} onChange={handleChangeValue} />
-            </div>
-          )}
-        </div>
+        <Field label="value">
+          <div className="flex">
+            <Select value={action.properties.type} onChange={handleChangeType}>
+              {getTypes(action).map((name) => (
+                <Select.Option key={name} value={name}>
+                  {name}
+                </Select.Option>
+              ))}
+            </Select>
+            {action.properties.type === 'manual' && (
+              <div className="flex flex-1">
+                <PropertyComponent value={action.properties.value} template={propertyTemplate} onChange={handleChangeValue} />
+              </div>
+            )}
+          </div>
+        </Field>
       )}
     </div>
   );
@@ -241,13 +245,13 @@ const Event = ({ id, event }) => {
   };
 
   return (
-    <div className="border-border flex flex-col border-b p-2">
-      <div className="flex justify-between">
-        <div className="flex items-center">
-          <div className="flex gap-1">
-            <Zap className="h-5 w-5 p-1" />
-            <div className="py-0.5">{event.name}</div>
-          </div>
+    <div className="border-border flex flex-col border-b">
+      <div className="flex justify-between border-b border-dashed border-neutral-800 px-2 py-1">
+        <div className="py-0.5">{event.name}</div>
+        <X className="hover:bg-active h-4 w-4 cursor-pointer rounded-sm p-0.5" onClick={handleRemoveEvent} />
+      </div>
+      <div className="flex flex-col py-0.5">
+        <Field label="action">
           <Select value={event.action?.name} onChange={handleChangeAction}>
             {Object.entries(Events[event.name]).map(([action]) => (
               <Select.Option key={action} value={action}>
@@ -255,10 +259,9 @@ const Event = ({ id, event }) => {
               </Select.Option>
             ))}
           </Select>
-        </div>
-        <X className="hover:bg-active h-4 w-4 cursor-pointer rounded-sm p-0.5" onClick={handleRemoveEvent} />
+        </Field>
+        {Action != null && <Action id={id} event={event} action={event.action} />}
       </div>
-      {Action != null && <Action id={id} event={event} action={event.action} />}
     </div>
   );
 };
@@ -273,15 +276,17 @@ export const WidgetPanel = () => {
     widget != null && (
       <div
         className={cx(
-          'border-border absolute -top-px -right-[calc(0.5rem-1px)] flex h-[calc(100%+2px)] w-80 translate-x-full flex-col overflow-y-auto rounded-sm border bg-black py-2',
+          'border-border absolute -top-px -right-[calc(0.5rem-1px)] flex h-[calc(100%+2px)] w-80 translate-x-full flex-col overflow-y-auto rounded-sm border bg-black py-1',
           focusedScreenId != null && 'pointer-events-none opacity-30'
         )}
         style={{ scrollbarWidth: 'none' }}
         onPointerDown={stopPropagation}>
-        {Object.entries(widgetTemplate.properties).map(([name, template]) => (
-          <Property key={name} id={widget.id} name={name} value={widget.properties[name]} template={template} />
-        ))}
-        <div className="bg-border mt-0.5 h-px w-full" />
+        <div className="flex flex-col py-0.5">
+          {Object.entries(widgetTemplate.properties).map(([name, template]) => (
+            <Property key={name} id={widget.id} name={name} value={widget.properties[name]} template={template} />
+          ))}
+        </div>
+        <div className="bg-border h-px w-full" />
         {widget.events.map((event) => (
           <Event key={event.id} id={widget.id} event={event} />
         ))}
