@@ -76,7 +76,7 @@ export const Workbench = () => {
           case 'set': {
             const target = state.widgets.find((widget) => widget.id === action.properties.target);
             switch (action.properties.type) {
-              case 'manual': {
+              case 'fixed': {
                 target.properties[action.properties.property] = action.properties.value;
                 break;
               }

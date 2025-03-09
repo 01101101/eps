@@ -14,7 +14,7 @@ const Option = ({ onSelect, isVisible, isSelected, children }) => {
   );
 };
 
-const Select = ({ value, onChange, children }) => {
+const Select = ({ value, onChange, children, className }) => {
   const [isActive, setIsActive] = useState(false);
 
   const { element, index } = useMemo(() => {
@@ -35,7 +35,7 @@ const Select = ({ value, onChange, children }) => {
   };
 
   return (
-    <div className="relative">
+    <div className={cx('relative', className)}>
       <div onClick={handleToggle}>
         {element ?? <div className="hover:bg-active cursor-pointer rounded-sm px-1 py-0.5 text-neutral-700 hover:text-neutral-500">empty</div>}
       </div>

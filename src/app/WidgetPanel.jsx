@@ -1,4 +1,4 @@
-import { Plus, X } from 'lucide-react';
+import { Plus, SquareMousePointer, X } from 'lucide-react';
 import { useCallback, useMemo } from 'react';
 import { Select } from '~/app/Select';
 import { useWorkbench } from '~/app/Workbench';
@@ -81,7 +81,7 @@ const AddEventButton = ({ id, name }) => {
   };
 
   return (
-    <div className="border-border hover:bg-active flex cursor-pointer justify-between border-b px-2 py-1" onClick={handleAddEvent}>
+    <div className="border-border hover:bg-active flex cursor-pointer justify-between border-b py-1 pr-1 pl-2" onClick={handleAddEvent}>
       <div className="py-0.5">{name}</div>
       <Plus className="h-5 w-5 p-1" />
     </div>
@@ -101,9 +101,9 @@ const SetAction = ({ id, event, action }) => {
     const type = allWidgets[target.type].properties[action.properties.property].type;
     switch (type) {
       case 'number':
-        return ['manual', 'increment', 'decrement', 'random'];
+        return ['fixed', 'increment', 'decrement', 'random'];
       case 'string':
-        return ['manual'];
+        return ['fixed'];
       default:
         return [];
     }
@@ -115,23 +115,22 @@ const SetAction = ({ id, event, action }) => {
     useWorkbench.setState((state) => {
       const widget = state.widgets.find((widget) => widget.id === id);
       const stateEvent = widget.events.find(({ id }) => id === event.id);
-      stateEvent.action.properties.target = focusedWidgetId;
+      stateEvent.action.properties = { target: focusedWidgetId };
       state.focusedScreenId = null;
     });
   }, []);
 
-  const handleKeyDown = useCallback(({ code }) => {
-    if (code === 'Escape') {
-      document.removeEventListener('keydown', handleKeyDown);
-      useWorkbench.getState().eventBus.removeEventListener('focusWidget', handleFocusWidget);
-      useWorkbench.setState((state) => {
-        state.focusedScreenId = null;
-      });
-    }
+  const handleDocumentClick = useCallback(() => {
+    document.removeEventListener('click', handleDocumentClick);
+    useWorkbench.getState().eventBus.removeEventListener('focusWidget', handleFocusWidget);
+    useWorkbench.setState((state) => {
+      state.focusedScreenId = null;
+    });
   }, []);
 
-  const handleClick = () => {
-    document.addEventListener('keydown', handleKeyDown);
+  const handleClick = (event) => {
+    event.stopPropagation();
+    document.addEventListener('click', handleDocumentClick);
     useWorkbench.getState().eventBus.addEventListener('focusWidget', handleFocusWidget);
     useWorkbench.setState((state) => {
       state.focusedScreenId = state.activeScreenId;
@@ -151,6 +150,8 @@ const SetAction = ({ id, event, action }) => {
       const widget = state.widgets.find((widget) => widget.id === id);
       const stateEvent = widget.events.find(({ id }) => id === event.id);
       stateEvent.action.properties.property = property;
+      stateEvent.action.properties.type = null;
+      stateEvent.action.properties.value = null;
     });
   };
 
@@ -175,10 +176,14 @@ const SetAction = ({ id, event, action }) => {
     <div className="flex flex-col">
       <Field label="target">
         <div
-          className={cx('hover:bg-active relative cursor-pointer rounded-sm px-1 py-0.5', target == null && 'text-neutral-700 hover:text-neutral-500')}
+          className={cx(
+            'hover:bg-active relative flex cursor-pointer gap-1 rounded-sm px-1 py-0.5',
+            target == null && 'text-neutral-700 hover:text-neutral-500'
+          )}
           onClick={handleClick}
           onPointerOver={handlePointerOver}
           onPointerOut={handlePointerOut}>
+          <SquareMousePointer className="h-4 w-4 p-0.5" />
           {target?.type ?? 'empty'}
         </div>
       </Field>
@@ -196,14 +201,14 @@ const SetAction = ({ id, event, action }) => {
       {action.properties.property != null && (
         <Field label="value">
           <div className="flex">
-            <Select value={action.properties.type} onChange={handleChangeType}>
+            <Select value={action.properties.type} onChange={handleChangeType} className={cx(action.properties.type !== 'fixed' && 'flex-1')}>
               {getTypes(action).map((name) => (
                 <Select.Option key={name} value={name}>
                   {name}
                 </Select.Option>
               ))}
             </Select>
-            {action.properties.type === 'manual' && (
+            {action.properties.type === 'fixed' && (
               <div className="flex flex-1">
                 <PropertyComponent value={action.properties.value} template={propertyTemplate} onChange={handleChangeValue} />
               </div>
@@ -246,9 +251,9 @@ const Event = ({ id, event }) => {
 
   return (
     <div className="border-border flex flex-col border-b">
-      <div className="flex justify-between border-b border-dashed border-neutral-800 px-2 py-1">
+      <div className="flex items-center justify-between border-b border-dashed border-neutral-800 py-1 pr-1 pl-2">
         <div className="py-0.5">{event.name}</div>
-        <X className="hover:bg-active h-4 w-4 cursor-pointer rounded-sm p-0.5" onClick={handleRemoveEvent} />
+        <X className="hover:bg-active h-5 w-5 cursor-pointer rounded-sm p-1" onClick={handleRemoveEvent} />
       </div>
       <div className="flex flex-col py-0.5">
         <Field label="action">
