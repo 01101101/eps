@@ -118,6 +118,9 @@ export const Widget = ({ id, screenId, size, position, children, className }) =>
     } else {
       useWorkbench.setState((state) => {
         state.widgets = state.widgets.filter((widget) => widget.id !== id);
+        state.widgets.forEach((widget) => {
+          widget.events = widget.events.filter((event) => event.action?.name !== 'set' || event.action.properties.target !== id);
+        });
         state.activeWidgetId = null;
       });
     }

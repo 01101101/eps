@@ -32,7 +32,7 @@ export const Event = ({ id, event }) => {
 
   return (
     <div className="border-border flex flex-col border-b">
-      <div className="flex items-center justify-between border-b border-dashed border-neutral-800 py-1 pr-1 pl-2">
+      <div className="border-border flex items-center justify-between border-b py-1 pr-1 pl-2">
         <div className="py-0.5">{event.name}</div>
         <X className="hover:bg-active h-5 w-5 cursor-pointer rounded-sm p-1" onClick={handleRemoveEvent} />
       </div>
