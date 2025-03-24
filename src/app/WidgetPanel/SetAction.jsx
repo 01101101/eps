@@ -7,21 +7,25 @@ import { useWorkbench } from '~/app/Workbench';
 import { cx } from '~/app/utils/css';
 import * as allWidgets from '~/widgets';
 
-export const SetAction = ({ id, event, action }) => {
+export const SetAction = ({ widget, event, action }) => {
+  const id = widget.id;
+
   const target = useMemo(
     () => (action.properties.target != null ? useWorkbench.getState().widgets.find((widget) => widget.id === action.properties.target) : null),
     [action.properties.target]
   );
 
+  const eventTemplate = allWidgets[widget.type]?.events[event.name];
   const propertyTemplate = allWidgets[target?.type]?.properties[action.properties.property];
   const PropertyComponent = Properties[propertyTemplate?.type];
 
   const getTypes = () => {
+    const widgetTypes = propertyTemplate.type === eventTemplate.type ? ['event'] : [];
     switch (propertyTemplate.type) {
       case 'number':
-        return ['fixed', ...Object.keys(propertyTemplate.accepts ?? {})];
+        return ['fixed', ...Object.keys(propertyTemplate.accepts ?? {}), ...widgetTypes];
       case 'string':
-        return ['fixed'];
+        return ['fixed', ...widgetTypes];
       default:
         return [];
     }

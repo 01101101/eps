@@ -52,7 +52,7 @@ export const WidgetPanel = () => {
         </div>
         <div className="bg-border col-span-2 h-px w-full" />
         {widget.events.map((event) => (
-          <Event key={event.id} id={widget.id} event={event} />
+          <Event key={event.id} widget={widget} event={event} />
         ))}
         {Object.entries(widgetTemplate.events).map(([name]) => (
           <AddEventButton key={name} id={widget.id} name={name} />

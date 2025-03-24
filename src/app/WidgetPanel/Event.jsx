@@ -18,7 +18,9 @@ export const Events = {
   },
 };
 
-export const Event = ({ id, event }) => {
+export const Event = ({ widget, event }) => {
+  const id = widget.id;
+
   const Action = Events[event.name][event.action?.name];
 
   const handleRemoveEvent = () => {
@@ -52,7 +54,7 @@ export const Event = ({ id, event }) => {
             ))}
           </Select>
         </Field>
-        {Action != null && <Action id={id} event={event} action={event.action} />}
+        {Action != null && <Action widget={widget} event={event} action={event.action} />}
       </div>
     </div>
   );

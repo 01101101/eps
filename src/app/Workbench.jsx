@@ -67,7 +67,7 @@ export const Workbench = () => {
     useWorkbench.setState({ element });
   }, []);
 
-  const handleAction = (id) => (event) => {
+  const handleAction = (id) => (event, value) => {
     useWorkbench.setState((state) => {
       const widget = state.widgets.find((widget) => widget.id === id);
       const events = widget.events.filter(({ name }) => name === event);
@@ -76,6 +76,10 @@ export const Workbench = () => {
           case 'set': {
             const target = state.widgets.find((widget) => widget.id === action.properties.target);
             switch (action.properties.type) {
+              case 'event': {
+                target.properties[action.properties.property] = value;
+                break;
+              }
               case 'fixed': {
                 target.properties[action.properties.property] = action.properties.value;
                 break;

@@ -1,8 +1,21 @@
+import { useEffect } from 'react';
 import { property } from '~/app/utils/widgets';
+import { useWorkbench } from '~/app/Workbench';
 
-export const Knob = ({ value, minimum, maximum }) => {
+export const Knob = ({ id, value, minimum, maximum, onAction }) => {
+  const handleWheel = ({ deltaY }) => {
+    useWorkbench.setState((state) => {
+      const widget = state.widgets.find((widget) => widget.id === id);
+      widget.properties.value = Math.min(Math.max(value + deltaY, minimum), maximum);
+    });
+  };
+
+  useEffect(() => {
+    onAction('change', value);
+  }, [value]);
+
   return (
-    <div className="relative">
+    <div className="relative" onWheel={handleWheel}>
       <svg viewBox="0 0 40 40">
         <circle className="stroke-border fill-black" cx="20" cy="20" r="19" strokeWidth="2" />
         <path
@@ -41,5 +54,7 @@ Knob.properties = {
 };
 
 Knob.events = {
-  change: {},
+  change: {
+    type: 'number',
+  },
 };
