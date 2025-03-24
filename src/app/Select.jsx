@@ -7,7 +7,7 @@ const Option = ({ onSelect, isVisible, isSelected, children }) => {
   return (
     <div
       onClick={onSelect}
-      className={cx('group hover:bg-active relative flex cursor-pointer items-center gap-1 rounded-sm px-1 py-0.5', isSelected && 'bg-active')}>
+      className={cx('group hover:bg-active relative flex cursor-pointer items-center justify-between gap-1 rounded-sm px-1 py-0.5', isSelected && 'bg-active')}>
       {children}
       {isVisible ? <ChevronDown className="h-3 w-3" /> : isSelected && <Check className="h-3 w-3" />}
     </div>
@@ -42,7 +42,7 @@ const Select = ({ value, onChange, children, className }) => {
       {isActive && (
         <div
           ref={ref}
-          className="border-border absolute z-10 flex min-w-full -translate-x-[calc(0.25rem-1px)] -translate-y-[calc(0.125rem+1px)] flex-col gap-0.5 rounded-sm border bg-black p-0.5 whitespace-nowrap"
+          className="border-border absolute z-10 flex min-w-[calc(100%+0.5rem-2px)] -translate-x-[calc(0.25rem-1px)] -translate-y-[calc(0.125rem+1px)] flex-col gap-0.5 rounded-sm border bg-black p-0.5 whitespace-nowrap"
           style={{ top: `calc(${index} * -1.5rem + ${index * 2}px)` }}>
           {Children.map(children, (child) => cloneElement(child, { isSelected: value === child.props.value, onSelect: handleSelect(child.props.value) }))}
         </div>

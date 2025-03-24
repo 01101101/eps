@@ -1,7 +1,7 @@
 export const Field = ({ label, children }) => {
   return (
-    <div className="flex flex-col px-1 py-0.5">
-      <div className="text-border px-1 text-[10px] uppercase">{label}</div>
+    <div className="col-span-2 grid grid-cols-subgrid items-center px-1 py-0.5">
+      <div className="text-border pr-1 pl-2 text-right text-[10px] uppercase">{label}</div>
       {children}
     </div>
   );

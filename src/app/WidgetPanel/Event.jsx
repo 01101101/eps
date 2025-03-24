@@ -6,8 +6,14 @@ import { SetAction } from '~/app/WidgetPanel/SetAction';
 import { useWorkbench } from '~/app/Workbench';
 
 export const Events = {
+  change: {
+    set: SetAction,
+  },
   click: {
     set: SetAction,
+    send: SendAction,
+  },
+  load: {
     send: SendAction,
   },
 };
@@ -31,12 +37,12 @@ export const Event = ({ id, event }) => {
   };
 
   return (
-    <div className="border-border flex flex-col border-b">
-      <div className="border-border flex items-center justify-between border-b py-1 pr-1 pl-2">
+    <div className="border-border col-span-2 grid grid-cols-subgrid border-b">
+      <div className="border-border col-span-2 flex items-center justify-between border-b py-1 pr-1 pl-2">
         <div className="py-0.5">{event.name}</div>
         <X className="hover:bg-active h-5 w-5 cursor-pointer rounded-sm p-1" onClick={handleRemoveEvent} />
       </div>
-      <div className="flex flex-col py-0.5">
+      <div className="col-span-2 grid grid-cols-subgrid py-0.5">
         <Field label="action">
           <Select value={event.action?.name} onChange={handleChangeAction}>
             {Object.entries(Events[event.name]).map(([action]) => (

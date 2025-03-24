@@ -9,4 +9,6 @@ Screen.minimumHeight = 5;
 
 Screen.properties = {};
 
-Screen.events = {};
+Screen.events = {
+  load: {},
+};

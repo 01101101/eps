@@ -105,7 +105,7 @@ export const SetAction = ({ id, event, action }) => {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="col-span-2 grid grid-cols-subgrid">
       <Field label="target">
         <div
           className={cx(
