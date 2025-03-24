@@ -7,7 +7,9 @@ Screen.defaultSize = { width: 10, height: 10 };
 Screen.minimumWidth = 5;
 Screen.minimumHeight = 5;
 
-Screen.properties = {};
+Screen.properties = {
+  name: { type: 'string' },
+};
 
 Screen.events = {
   load: {},

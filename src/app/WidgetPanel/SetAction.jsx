@@ -20,6 +20,7 @@ export const SetAction = ({ widget, event, action }) => {
   const PropertyComponent = Properties[propertyTemplate?.type];
 
   const getTypes = () => {
+    // TODO get possible values from the property template (i.e. what it accepts), from the event, from the action output and from the current screen
     const widgetTypes = propertyTemplate.type === eventTemplate.type ? ['event'] : [];
     switch (propertyTemplate.type) {
       case 'number':
@@ -113,13 +114,13 @@ export const SetAction = ({ widget, event, action }) => {
       <Field label="target">
         <div
           className={cx(
-            'hover:bg-active relative flex cursor-pointer gap-1 rounded-sm px-1 py-0.5',
+            'hover:bg-active relative flex cursor-pointer items-baseline gap-1 rounded-sm px-1 py-0.5',
             target == null && 'text-neutral-700 hover:text-neutral-500'
           )}
           onClick={handleClick}
           onPointerOver={handlePointerOver}
           onPointerOut={handlePointerOut}>
-          <SquareMousePointer className="h-4 w-4 p-0.5" />
+          <SquareMousePointer className="h-4 w-4 self-center p-0.5" />
           {target?.type ?? 'empty'}
         </div>
       </Field>
