@@ -16,21 +16,27 @@ export const SetAction = ({ widget, event, action }) => {
   );
 
   const eventTemplate = allWidgets[widget.type]?.events[event.name];
-  const propertyTemplate = allWidgets[target?.type]?.properties[action.properties.property];
+  const properties = allWidgets[target?.type]?.properties;
+  const propertyTemplate = properties[action.properties.property];
   const PropertyComponent = Properties[propertyTemplate?.type];
 
   const getPropertyTypes = () => {
+    const types = ['fixed'];
     // TODO get possible values from the property template (i.e. what it accepts), from the event, from the action output and from the current screen
-    const hasEventValue = eventTemplate.type === propertyTemplate.type;
     switch (propertyTemplate.type) {
-      case 'number':
-        return ['fixed', '-', 'increment', 'decrement', 'random'].concat(hasEventValue ? ['-', 'event'] : []);
-      // return ['fixed', ...Object.keys(propertyTemplate.accepts ?? {}), ...widgetTypes];
-      case 'string':
-        return ['fixed'].concat(hasEventValue ? ['-', 'event'] : []);
+      case 'number': {
+        types.push('-', 'increment', 'decrement');
+        if (!['minimum', 'maximum'].includes(action.properties.property) && 'minimum' in properties && 'maximum' in properties) {
+          types.push('random');
+        }
+        break;
+      }
       default:
-        return [];
     }
+    if (eventTemplate.type === propertyTemplate.type) {
+      types.push('-', 'event');
+    }
+    return types;
   };
 
   const handleFocusWidget = useCallback(({ detail: focusedWidgetId }) => {

@@ -55,23 +55,11 @@ Knob.minimumHeight = 4;
 Knob.keepAspectRatio = true;
 
 Knob.properties = {
-  value: {
-    type: 'number',
-    minimum: property('minimum'),
-    maximum: property('maximum'),
-    accepts: {
-      decrement: (values) => (values.value - 1 >= values.minimum ? values.value - 1 : values.value),
-      increment: (values) => (values.value + 1 <= values.maximum ? values.value + 1 : values.value),
-      random: (values) => Math.floor(Math.random() * (values.maximum - values.minimum + 1)) + values.minimum,
-    },
-    default: 0,
-  },
+  value: { type: 'number', minimum: property('minimum'), maximum: property('maximum'), default: 0 },
   minimum: { type: 'number', maximum: property('value'), default: 0 },
   maximum: { type: 'number', minimum: property('value'), default: 255 },
 };
 
 Knob.events = {
-  change: {
-    type: 'number',
-  },
+  change: { type: 'number' },
 };

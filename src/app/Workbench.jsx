@@ -76,18 +76,28 @@ export const Workbench = () => {
           case 'set': {
             const target = state.widgets.find((widget) => widget.id === action.properties.target);
             switch (action.properties.type) {
-              case 'event': {
-                target.properties[action.properties.property] = value;
-                break;
-              }
               case 'fixed': {
                 target.properties[action.properties.property] = action.properties.value;
                 break;
               }
-              default: {
-                const propertyTemplate = allWidgets[target.type].properties[action.properties.property];
-                target.properties[action.properties.property] = propertyTemplate.accepts[action.properties.type](target.properties);
+              case 'increment': {
+                target.properties[action.properties.property] = target.properties[action.properties.property] + 1;
+                break;
               }
+              case 'decrement': {
+                target.properties[action.properties.property] = target.properties[action.properties.property] - 1;
+                break;
+              }
+              case 'random': {
+                target.properties[action.properties.property] =
+                  Math.floor(Math.random() * (target.properties.maximum - target.properties.minimum + 1)) + target.properties.minimum;
+                break;
+              }
+              case 'event': {
+                target.properties[action.properties.property] = value;
+                break;
+              }
+              default:
             }
             break;
           }

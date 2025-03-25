@@ -17,7 +17,6 @@ const Option = ({ onSelect, isVisible, isSelected, children }) => {
 const Separator = () => {
   return <div className="bg-border -mx-0.5 h-px w-[calc(100%+0.25rem)]" />;
 };
-Separator.displayName = 'Separator';
 
 const Select = ({ value, onChange, children, className }) => {
   const [isActive, setIsActive] = useState(false);
