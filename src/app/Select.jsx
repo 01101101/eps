@@ -14,13 +14,26 @@ const Option = ({ onSelect, isVisible, isSelected, children }) => {
   );
 };
 
+const Separator = () => {
+  return <div className="bg-border -mx-0.5 h-px w-[calc(100%+0.25rem)]" />;
+};
+Separator.displayName = 'Separator';
+
 const Select = ({ value, onChange, children, className }) => {
   const [isActive, setIsActive] = useState(false);
 
-  const { element, index } = useMemo(() => {
+  const { top, element, index } = useMemo(() => {
     const childrenArray = Children.toArray(children);
     const index = childrenArray.findIndex(({ props }) => props.value === value);
-    return { index: index !== -1 ? index : 0, element: index !== -1 ? cloneElement(childrenArray[index], { isVisible: true }) : null };
+    const { itemCount, separatorCount } = childrenArray.slice(0, index).reduce(
+      ({ itemCount, separatorCount }, item) => {
+        const isItem = 'value' in item.props;
+        return { itemCount: itemCount + (isItem ? 1 : 0), separatorCount: separatorCount + (isItem ? 0 : 1) };
+      },
+      { itemCount: 0, separatorCount: 0 }
+    );
+    const top = `calc(${itemCount} * -1.5rem + ${-separatorCount} * (0.25rem + 1px) + ${index * 2}px)`;
+    return { top, element: index === -1 ? null : cloneElement(childrenArray[index], { isVisible: true }) };
   }, [children]);
 
   const ref = useOutsideClick(useCallback(() => setIsActive(false), []));
@@ -43,7 +56,7 @@ const Select = ({ value, onChange, children, className }) => {
         <div
           ref={ref}
           className="border-border absolute z-10 flex min-w-[calc(100%+0.5rem-2px)] -translate-x-[calc(0.25rem-1px)] -translate-y-[calc(0.125rem+1px)] flex-col gap-0.5 rounded-sm border bg-black p-0.5 whitespace-nowrap"
-          style={{ top: `calc(${index} * -1.5rem + ${index * 2}px)` }}>
+          style={{ top }}>
           {Children.map(children, (child) => cloneElement(child, { isSelected: value === child.props.value, onSelect: handleSelect(child.props.value) }))}
         </div>
       )}
@@ -52,5 +65,6 @@ const Select = ({ value, onChange, children, className }) => {
 };
 
 Select.Option = Option;
+Select.Separator = Separator;
 
 export { Select };

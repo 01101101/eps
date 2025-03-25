@@ -19,14 +19,15 @@ export const SetAction = ({ widget, event, action }) => {
   const propertyTemplate = allWidgets[target?.type]?.properties[action.properties.property];
   const PropertyComponent = Properties[propertyTemplate?.type];
 
-  const getTypes = () => {
+  const getPropertyTypes = () => {
     // TODO get possible values from the property template (i.e. what it accepts), from the event, from the action output and from the current screen
-    const widgetTypes = propertyTemplate.type === eventTemplate.type ? ['event'] : [];
+    const hasEventValue = eventTemplate.type === propertyTemplate.type;
     switch (propertyTemplate.type) {
       case 'number':
-        return ['fixed', ...Object.keys(propertyTemplate.accepts ?? {}), ...widgetTypes];
+        return ['fixed', '-', 'increment', 'decrement', 'random'].concat(hasEventValue ? ['-', 'event'] : []);
+      // return ['fixed', ...Object.keys(propertyTemplate.accepts ?? {}), ...widgetTypes];
       case 'string':
-        return ['fixed', ...widgetTypes];
+        return ['fixed'].concat(hasEventValue ? ['-', 'event'] : []);
       default:
         return [];
     }
@@ -139,11 +140,15 @@ export const SetAction = ({ widget, event, action }) => {
         <Field label="value">
           <div className="flex">
             <Select value={action.properties.type} onChange={handleChangeType} className={cx(action.properties.type !== 'fixed' && 'flex-1')}>
-              {getTypes(action).map((name) => (
-                <Select.Option key={name} value={name}>
-                  {name}
-                </Select.Option>
-              ))}
+              {getPropertyTypes(action).map((name, index) =>
+                name === '-' ? (
+                  <Select.Separator key={index.toString()} />
+                ) : (
+                  <Select.Option key={name} value={name}>
+                    {name}
+                  </Select.Option>
+                )
+              )}
             </Select>
             {action.properties.type === 'fixed' && (
               <div className="flex flex-1">
