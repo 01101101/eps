@@ -40,7 +40,7 @@ export const WidgetPanel = () => {
     widget != null && (
       <div
         className={cx(
-          'border-border absolute -top-px -right-[calc(0.5rem-1px)] grid h-[calc(100%+2px)] w-80 translate-x-full auto-rows-min grid-cols-[min-content_1fr] flex-col overflow-y-auto rounded-sm border bg-black',
+          'border-border absolute -top-px -right-[calc(0.5rem-1px)] grid h-[calc(100%+2px)] w-96 translate-x-full auto-rows-min grid-cols-[min-content_1fr] flex-col overflow-y-auto rounded-sm border bg-black',
           focusedScreenId != null && 'pointer-events-none opacity-30'
         )}
         style={{ scrollbarWidth: 'none' }}

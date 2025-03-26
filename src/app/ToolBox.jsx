@@ -27,7 +27,7 @@ export const ToolBox = () => {
   return (
     <div
       className={cx(
-        'border-border absolute -top-px -left-[calc(0.5rem-1px)] flex h-[calc(100%+2px)] w-44 -translate-x-full flex-col gap-1 overflow-y-auto rounded-sm border bg-black p-1',
+        'border-border absolute -top-px -left-[calc(0.5rem-1px)] flex h-[calc(100%+2px)] w-32 -translate-x-full flex-col gap-1 overflow-y-auto rounded-sm border bg-black p-1',
         focusedScreenId != null && 'pointer-events-none opacity-30'
       )}
       style={{ scrollbarWidth: 'none' }}>
