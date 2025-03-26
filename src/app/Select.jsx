@@ -24,7 +24,7 @@ const Select = ({ value, onChange, children, className }) => {
   const { top, element, index } = useMemo(() => {
     const childrenArray = Children.toArray(children);
     const index = childrenArray.findIndex(({ props }) => props.value === value);
-    const { itemCount, separatorCount } = childrenArray.slice(0, index).reduce(
+    const { itemCount, separatorCount } = (index === -1 ? [] : childrenArray.slice(0, index)).reduce(
       ({ itemCount, separatorCount }, item) => {
         const isItem = 'value' in item.props;
         return { itemCount: itemCount + (isItem ? 1 : 0), separatorCount: separatorCount + (isItem ? 0 : 1) };
@@ -32,6 +32,7 @@ const Select = ({ value, onChange, children, className }) => {
       { itemCount: 0, separatorCount: 0 }
     );
     const top = `calc(${itemCount} * -1.5rem + ${-separatorCount} * (0.25rem + 1px) + ${index * 2}px)`;
+    console.log({ index });
     return { top, element: index === -1 ? null : cloneElement(childrenArray[index], { isVisible: true }) };
   }, [children]);
 
@@ -45,6 +46,8 @@ const Select = ({ value, onChange, children, className }) => {
     onChange(value);
     setIsActive(false);
   };
+
+  console.log(top);
 
   return (
     <div className={cx('relative', className)}>
