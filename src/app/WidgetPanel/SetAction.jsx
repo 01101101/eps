@@ -22,7 +22,7 @@ export const SetAction = ({ widget, event, action }) => {
 
   const getPropertyTypes = () => {
     const types = ['fixed'];
-    // TODO get possible values from the property template (i.e. what it accepts), from the event, from the action output and from the current screen
+    // TODO Get possible values from the property template (i.e. what it accepts), from the event, from the action output and from the current screen
     switch (propertyTemplate.type) {
       case 'number': {
         types.push('-', 'increment', 'decrement');
