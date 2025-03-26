@@ -15,9 +15,11 @@ export const SetAction = ({ widget, event, action }) => {
     [action.properties.target]
   );
 
+  console.log(action);
+
   const eventTemplate = allWidgets[widget.type]?.events[event.name];
   const properties = allWidgets[target?.type]?.properties;
-  const propertyTemplate = properties[action.properties.property];
+  const propertyTemplate = properties?.[action.properties.property];
   const PropertyComponent = Properties[propertyTemplate?.type];
 
   const getPropertyTypes = () => {
