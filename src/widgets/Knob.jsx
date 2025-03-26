@@ -6,7 +6,7 @@ export const Knob = ({ id, value, minimum, maximum, onAction }) => {
   const handleWheel = ({ deltaY }) => {
     useWorkbench.setState((state) => {
       const widget = state.widgets.find((widget) => widget.id === id);
-      widget.properties.value = Math.min(Math.max(value + Math.round(deltaY), minimum), maximum);
+      widget.properties.value = Math.min(Math.max(value + (deltaY > 0 ? 1 : -1), minimum), maximum);
     });
   };
 
